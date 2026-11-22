@@ -637,6 +637,182 @@ router.post('/:id/cancel', async (req, res) => {
 });
 
 /**
+ * POST /api/queue/:id/start
+ * Updates ticket status to in-chair and starts elapsed service timer
+ * Emits ticket:started and queue:updated
+ */
+router.post('/:id/start', async (req, res) => {
+  try {
+    const { id } = req.params;
+    let ticket = null;
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      ticket = await QueueTicket.findById(id);
+    } else {
+      ticket = await QueueTicket.findOne({ token: id });
+    }
+
+    if (!ticket) {
+      return res.status(404).json({ success: false, message: 'Ticket not found.' });
+    }
+
+    if (ticket.status === 'done' || ticket.status === 'cancelled') {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot start service for ticket in "${ticket.status}" status.`,
+      });
+    }
+
+    ticket.status = 'in-chair';
+    ticket.inChairAt = new Date();
+
+    // Ensure assigned barber is set to busy
+    if (ticket.assignedBarber) {
+      const barber = await Barber.findById(ticket.assignedBarber);
+      if (barber) {
+        barber.status = 'busy';
+        await barber.save();
+
+        if (req.io) {
+          req.io.emit('barber:updated', {
+            barberId: barber._id,
+            name: barber.name,
+            status: 'busy',
+            isOnDuty: barber.isOnDuty,
+          });
+          req.io.emit('barber:status-changed', {
+            barberId: barber._id,
+            name: barber.name,
+            status: 'busy',
+          });
+        }
+      }
+    }
+
+    await ticket.save();
+
+    const populatedTicket = await QueueTicket.findById(ticket._id)
+      .populate('services')
+      .populate('assignedBarber');
+
+    if (req.io) {
+      req.io.emit('ticket:started', {
+        ticketId: populatedTicket._id,
+        token: populatedTicket.token,
+        status: 'in-chair',
+        assignedBarber: populatedTicket.assignedBarber,
+      });
+
+      req.io.emit('queue:updated', {
+        action: 'started',
+        ticketId: populatedTicket._id,
+        token: populatedTicket.token,
+        status: 'in-chair',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `Service started for Token ${populatedTicket.token}! Customer is now seated in chair.`,
+      ticket: populatedTicket,
+    });
+  } catch (error) {
+    console.error('Error starting service for ticket:', error);
+    res.status(500).json({ success: false, message: 'Server error starting service.' });
+  }
+});
+
+/**
+ * POST /api/queue/:id/done
+ * Updates ticket status to done, sets barber status to free
+ * Emits ticket:done and queue:updated
+ */
+router.post('/:id/done', async (req, res) => {
+  try {
+    const { id } = req.params;
+    let ticket = null;
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      ticket = await QueueTicket.findById(id);
+    } else {
+      ticket = await QueueTicket.findOne({ token: id });
+    }
+
+    if (!ticket) {
+      return res.status(404).json({ success: false, message: 'Ticket not found.' });
+    }
+
+    ticket.status = 'done';
+    ticket.completedAt = new Date();
+    await ticket.save();
+
+    // Release barber back to free if no other active in-chair/called ticket exists
+    if (ticket.assignedBarber) {
+      const barberId = ticket.assignedBarber._id || ticket.assignedBarber;
+      const otherActive = await QueueTicket.findOne({
+        _id: { $ne: ticket._id },
+        assignedBarber: barberId,
+        status: { $in: ['called', 'in-chair'] },
+      });
+
+      if (!otherActive) {
+        const barber = await Barber.findById(barberId);
+        if (barber) {
+          // If barber was not manually put on break, return to free
+          if (barber.status !== 'break') {
+            barber.status = 'free';
+            await barber.save();
+          }
+
+          if (req.io) {
+            req.io.emit('barber:updated', {
+              barberId: barber._id,
+              name: barber.name,
+              status: barber.status,
+              isOnDuty: barber.isOnDuty,
+            });
+            req.io.emit('barber:status-changed', {
+              barberId: barber._id,
+              name: barber.name,
+              status: barber.status,
+            });
+          }
+        }
+      }
+    }
+
+    const populatedTicket = await QueueTicket.findById(ticket._id)
+      .populate('services')
+      .populate('assignedBarber');
+
+    if (req.io) {
+      req.io.emit('ticket:done', {
+        ticketId: populatedTicket._id,
+        token: populatedTicket.token,
+        status: 'done',
+        assignedBarber: populatedTicket.assignedBarber,
+      });
+
+      req.io.emit('queue:updated', {
+        action: 'done',
+        ticketId: populatedTicket._id,
+        token: populatedTicket.token,
+        status: 'done',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `Service completed for Token ${populatedTicket.token}! Barber chair is now free.`,
+      ticket: populatedTicket,
+    });
+  } catch (error) {
+    console.error('Error completing service for ticket:', error);
+    res.status(500).json({ success: false, message: 'Server error completing service.' });
+  }
+});
+
+/**
  * PATCH /api/queue/:id/status
  * Update ticket status (waiting, called, in-chair, done, no-show, cancelled)
  */

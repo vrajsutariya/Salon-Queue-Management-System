@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { api } from '../services/api';
+import { BarberAvatar } from '../components/BarberAvatar';
 
 export const JoinQueue = () => {
   const { lang, t } = useLanguage();
@@ -359,18 +360,11 @@ export const JoinQueue = () => {
                     }}
                   >
                     <div className="d-flex align-items-center gap-3">
-                      <div
-                        className="rounded-circle d-flex align-items-center justify-content-center"
-                        style={{
-                          width: '44px',
-                          height: '44px',
-                          backgroundColor: 'rgba(229, 195, 120, 0.15)',
-                          color: 'var(--accent-color)',
-                          border: '1px solid var(--accent-color)',
-                        }}
-                      >
-                        <i className="bi bi-lightning-charge-fill fs-5"></i>
-                      </div>
+                      <BarberAvatar
+                        name="any"
+                        size={48}
+                        active={preferredBarber === 'any'}
+                      />
                       <div>
                         <div className="fw-semibold text-white">{t('fastestAvailable')}</div>
                         <small style={{ color: 'var(--text-secondary)' }}>First available chair</small>
@@ -405,16 +399,12 @@ export const JoinQueue = () => {
                         }}
                       >
                         <div className="d-flex align-items-center gap-3">
-                          <img
-                            src={barber.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
-                            alt={barber.name}
-                            className="rounded-circle border"
-                            style={{
-                              width: '44px',
-                              height: '44px',
-                              objectFit: 'cover',
-                              borderColor: 'var(--border-color)',
-                            }}
+                          <BarberAvatar
+                            name={barber.name}
+                            size={48}
+                            status={barber.status}
+                            active={isSelected}
+                            showStatusDot
                           />
                           <div>
                             <div className="fw-semibold text-white">{barber.name}</div>

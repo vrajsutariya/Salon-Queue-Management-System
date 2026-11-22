@@ -27,7 +27,7 @@ function App() {
               <Route path="/status" element={<Navigate to="/join" replace />} />
               <Route path="/reception" element={<Reception />} />
               <Route path="/barber/:name" element={<BarberView />} />
-              <Route path="/barber" element={<Navigate to="/barber/Rahul" replace />} />
+              <Route path="/barber" element={<Navigate to="/barber/Ravi" replace />} />
               <Route path="/display" element={<WaitingAreaTV />} />
               <Route path="/admin" element={<AdminSettings />} />
               <Route path="*" element={<Navigate to="/" replace />} />

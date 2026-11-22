@@ -4,6 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { api } from '../services/api';
 import { socket } from '../services/socket';
 import { playLuxuryChime, triggerHapticFeedback } from '../utils/audio';
+import { BarberAvatar } from '../components/BarberAvatar';
 
 export const MyStatus = () => {
   const { id } = useParams();
@@ -12,6 +13,7 @@ export const MyStatus = () => {
 
   // State
   const [ticketData, setTicketData] = useState(null);
+  const [barbersList, setBarbersList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isSocketConnected, setIsSocketConnected] = useState(socket.connected);
@@ -26,13 +28,17 @@ export const MyStatus = () => {
   // Fetch ticket details from backend
   const fetchTicket = async () => {
     try {
-      const data = await api.getTicketStatus(id);
-      if (data.success) {
-        setTicketData(data);
+      const [ticketRes, barbersRes] = await Promise.all([
+        api.getTicketStatus(id),
+        api.getBarbers().catch(() => ({ success: false, barbers: [] })),
+      ]);
+
+      if (ticketRes.success) {
+        setTicketData(ticketRes);
         setError(null);
 
         // If status transitioned to 'called', trigger luxury chime and haptic feedback
-        const newStatus = data.ticket?.status;
+        const newStatus = ticketRes.ticket?.status;
         if (newStatus === 'called' && prevStatusRef.current !== 'called') {
           playLuxuryChime();
           triggerHapticFeedback();
@@ -40,6 +46,10 @@ export const MyStatus = () => {
           setChimePlayed(true);
         }
         prevStatusRef.current = newStatus;
+      }
+
+      if (barbersRes.success) {
+        setBarbersList(barbersRes.barbers || []);
       }
     } catch (err) {
       console.error('Error fetching ticket status:', err);
@@ -81,7 +91,11 @@ export const MyStatus = () => {
     socket.on('disconnect', onDisconnect);
     socket.on('queue:updated', handleQueueUpdated);
     socket.on('ticket:called', handleTicketCalled);
+    socket.on('ticket:started', handleQueueUpdated);
+    socket.on('ticket:done', handleQueueUpdated);
     socket.on('ticket:cancelled', handleTicketCancelled);
+    socket.on('barber:updated', handleQueueUpdated);
+    socket.on('barber:status-changed', handleQueueUpdated);
 
     // Periodic safety poll every 12 seconds
     const interval = setInterval(fetchTicket, 12000);
@@ -91,7 +105,11 @@ export const MyStatus = () => {
       socket.off('disconnect', onDisconnect);
       socket.off('queue:updated', handleQueueUpdated);
       socket.off('ticket:called', handleTicketCalled);
+      socket.off('ticket:started', handleQueueUpdated);
+      socket.off('ticket:done', handleQueueUpdated);
       socket.off('ticket:cancelled', handleTicketCancelled);
+      socket.off('barber:updated', handleQueueUpdated);
+      socket.off('barber:status-changed', handleQueueUpdated);
       clearInterval(interval);
     };
   }, [id, ticketData?.ticket?.token]);
@@ -99,6 +117,18 @@ export const MyStatus = () => {
   const ticket = ticketData?.ticket;
   const position = ticketData?.position ?? 1;
   const waitMinutes = ticketData?.estimatedWaitTimeMinutes ?? 0;
+
+  // Check if requested preferred barber is currently on break
+  const preferredBarberObj = useMemo(() => {
+    if (!ticket || !ticket.preferredBarber || ticket.preferredBarber === 'any') return null;
+    return barbersList.find(
+      (b) =>
+        b.name?.toLowerCase() === ticket.preferredBarber?.toLowerCase() ||
+        b._id === ticket.preferredBarber
+    );
+  }, [ticket, barbersList]);
+
+  const isPreferredBarberOnBreak = preferredBarberObj?.status === 'break';
 
   // Position pill text helper
   const getPositionText = (pos) => {
@@ -262,6 +292,27 @@ export const MyStatus = () => {
             </div>
           )}
 
+          {/* Requested Barber on Break Alert Banner */}
+          {ticket.status === 'waiting' && isPreferredBarberOnBreak && (
+            <div
+              className="p-3 mb-4 rounded-3 d-flex align-items-center gap-3 animate-fade-in-up"
+              style={{
+                backgroundColor: 'rgba(217, 119, 6, 0.16)',
+                border: '1px solid var(--amber-warning)',
+              }}
+            >
+              <i className="bi bi-cup-hot-fill fs-3 text-warning"></i>
+              <div>
+                <h6 className="fw-bold text-white mb-0">
+                  {preferredBarberObj.name} is on break
+                </h6>
+                <small style={{ color: 'var(--text-secondary)' }}>
+                  Your requested stylist is currently taking a short break. You will be called as soon as they return!
+                </small>
+              </div>
+            </div>
+          )}
+
           {/* Cancelled Notice Banner */}
           {ticket.status === 'cancelled' && (
             <div
@@ -417,18 +468,11 @@ export const MyStatus = () => {
             >
               <div className="d-flex align-items-center justify-content-between">
                 <div className="d-flex align-items-center gap-3">
-                  <div
-                    className="rounded-circle d-flex align-items-center justify-content-center"
-                    style={{
-                      width: '44px',
-                      height: '44px',
-                      background: 'var(--gold-gradient-subtle)',
-                      border: '1px solid var(--gold-primary)',
-                      color: 'var(--gold-primary)',
-                    }}
-                  >
-                    <i className="bi bi-scissors fs-5"></i>
-                  </div>
+                  <BarberAvatar
+                    name={ticket.assignedBarber?.name || ticket.preferredBarber}
+                    size={44}
+                    status={ticket.assignedBarber?.status}
+                  />
                   <div>
                     <span className="text-secondary small d-block" style={{ fontSize: '0.75rem' }}>
                       {ticket.assignedBarber ? t('assignedBarber') : t('preferredBarberLabel')}

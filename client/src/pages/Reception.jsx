@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { api } from '../services/api';
 import { socket } from '../services/socket';
+import { BarberAvatar } from '../components/BarberAvatar';
 
 export const Reception = () => {
   const { lang, toggleLanguage, t } = useLanguage();
@@ -69,18 +70,24 @@ export const Reception = () => {
 
     socket.on('queue:updated', handleQueueUpdated);
     socket.on('ticket:called', handleTicketCalled);
+    socket.on('ticket:started', handleQueueUpdated);
+    socket.on('ticket:done', handleQueueUpdated);
     socket.on('ticket:cancelled', handleTicketCancelled);
     socket.on('ticket:no-show', handleQueueUpdated);
     socket.on('barber:updated', handleBarberUpdated);
+    socket.on('barber:status-changed', handleBarberUpdated);
 
     const pollInterval = setInterval(fetchDashboardData, 15000);
 
     return () => {
       socket.off('queue:updated', handleQueueUpdated);
       socket.off('ticket:called', handleTicketCalled);
+      socket.off('ticket:started', handleQueueUpdated);
+      socket.off('ticket:done', handleQueueUpdated);
       socket.off('ticket:cancelled', handleTicketCancelled);
       socket.off('ticket:no-show', handleQueueUpdated);
       socket.off('barber:updated', handleBarberUpdated);
+      socket.off('barber:status-changed', handleBarberUpdated);
       clearInterval(pollInterval);
     };
   }, []);
@@ -115,12 +122,11 @@ export const Reception = () => {
 
   // 2. Toggle Barber Break Status
   const handleToggleBarberStatus = async (barber) => {
-    const nextStatus = barber.status === 'break' ? 'free' : 'break';
     try {
-      await api.updateBarberStatus(barber._id, nextStatus);
+      await api.toggleBarberBreak(barber.name || barber._id);
       fetchDashboardData();
     } catch (err) {
-      console.error('Error updating barber status:', err);
+      console.error('Error toggling barber break status:', err);
     }
   };
 
@@ -374,10 +380,10 @@ export const Reception = () => {
                       {/* Barber Top Info */}
                       <div className="d-flex align-items-center justify-content-between mb-3">
                         <div className="d-flex align-items-center gap-3">
-                          <img
-                            src={barber.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
-                            alt={barber.name}
-                            className="barber-avatar-sm"
+                          <BarberAvatar
+                            name={barber.name}
+                            size="sm"
+                            status={barber.status}
                           />
                           <div>
                             <h6 className="mb-0 fw-semibold" style={{ color: 'var(--heading-color)', fontSize: '1.05rem', fontFamily: 'Fraunces, serif' }}>

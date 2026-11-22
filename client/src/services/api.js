@@ -142,4 +142,55 @@ export const api = {
       data,
     };
   },
+
+  async toggleBarberBreak(barberName) {
+    const res = await fetch(`${API_BASE_URL}/api/barbers/${encodeURIComponent(barberName)}/toggle-break`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
+
+  async startService(ticketId) {
+    const res = await fetch(`${API_BASE_URL}/api/queue/${ticketId}/start`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
+
+  async completeService(ticketId) {
+    const res = await fetch(`${API_BASE_URL}/api/queue/${ticketId}/done`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
+
+  async getBarber(identifier) {
+    const res = await fetch(`${API_BASE_URL}/api/barbers/${encodeURIComponent(identifier)}`);
+    if (!res.ok) throw new Error('Failed to fetch barber details');
+    return res.json();
+  },
 };

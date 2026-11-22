@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { api } from '../services/api';
 import { socket } from '../services/socket';
+import { BarberAvatar } from '../components/BarberAvatar';
 
 export const Home = () => {
   const { lang, t } = useLanguage();
@@ -258,10 +259,10 @@ export const Home = () => {
 
               return (
                 <div key={barber._id} className={`barber-chip ${statusClass}`}>
-                  <img
-                    src={barber.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
-                    alt={barber.name}
-                    className="barber-avatar-sm"
+                  <BarberAvatar
+                    name={barber.name}
+                    size="sm"
+                    status={barber.status}
                   />
                   <div>
                     <span className="fw-semibold text-white me-2" style={{ fontSize: '0.95rem' }}>

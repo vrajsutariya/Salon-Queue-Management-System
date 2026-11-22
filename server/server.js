@@ -6,6 +6,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import salonRoutes from './routes/salonRoutes.js';
 import queueRoutes from './routes/queueRoutes.js';
+import barberRoutes from './routes/barberRoutes.js';
 import { seedDatabase } from './seeds/seedData.js';
 
 dotenv.config();
@@ -55,11 +56,7 @@ app.use('/api/services', (req, res, next) => {
   req.url = '/services';
   salonRoutes(req, res, next);
 });
-app.use('/api/barbers', (req, res, next) => {
-  // redirect or forward to salon/barbers
-  req.url = '/barbers';
-  salonRoutes(req, res, next);
-});
+app.use('/api/barbers', barberRoutes);
 app.use('/api/queue', queueRoutes);
 
 // Health Check Endpoint

@@ -53,16 +53,24 @@ export const Navbar = () => {
 
         {/* Snug Cohesive Navigation Links */}
         <div className="d-none d-lg-flex align-items-center gap-1 px-1">
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              className={({ isActive }) => `floating-nav-link ${isActive ? 'active' : ''}`}
-            >
-              <i className={`bi ${link.icon} opacity-75`}></i>
-              <span>{link.label}</span>
-            </NavLink>
-          ))}
+          {navLinks.map((link) => {
+            const isCustomActive = link.to.startsWith('/barber')
+              ? location.pathname.startsWith('/barber')
+              : undefined;
+
+            return (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  `floating-nav-link ${(isCustomActive ?? isActive) ? 'active' : ''}`
+                }
+              >
+                <i className={`bi ${link.icon} opacity-75`}></i>
+                <span>{link.label}</span>
+              </NavLink>
+            );
+          })}
         </div>
 
         {/* Right Controls: Live Status & Language Switch */}
