@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { api } from '../services/api';
+import { socket } from '../services/socket';
 import { BarberAvatar } from '../components/BarberAvatar';
 
 export const JoinQueue = () => {
@@ -48,6 +49,17 @@ export const JoinQueue = () => {
     };
 
     fetchData();
+
+    const handleUpdate = () => fetchData();
+    socket.on('queue:updated', handleUpdate);
+    socket.on('salon:status-changed', handleUpdate);
+    socket.on('services:updated', handleUpdate);
+
+    return () => {
+      socket.off('queue:updated', handleUpdate);
+      socket.off('salon:status-changed', handleUpdate);
+      socket.off('services:updated', handleUpdate);
+    };
   }, []);
 
   // Validation
@@ -163,7 +175,32 @@ export const JoinQueue = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
+      {liveStatus?.isQueueOpen === false ? (
+        <motion.div
+          className="salon-card p-4 p-md-5 text-center my-4"
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          style={{
+            border: '1.5px solid var(--amber-warning)',
+            background: 'linear-gradient(180deg, rgba(26, 22, 16, 0.95) 0%, rgba(14, 12, 10, 0.98) 100%)',
+          }}
+        >
+          <div
+            className="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle"
+            style={{ width: '80px', height: '80px', background: 'rgba(217, 119, 6, 0.15)', border: '1px solid var(--amber-warning)' }}
+          >
+            <i className="bi bi-door-closed display-4 text-warning"></i>
+          </div>
+          <h2 className="salon-heading text-white mb-2">Online Joining is Closed</h2>
+          <p className="text-secondary mx-auto mb-4" style={{ maxWidth: '520px', fontSize: '1.05rem' }}>
+            Online joining is closed for today. Walk-ins are still welcome at the salon. Please visit our front desk to take a spot.
+          </p>
+          <Link to="/" className="btn btn-gold px-4 py-2">
+            <i className="bi bi-house me-1"></i> Return to Home
+          </Link>
+        </motion.div>
+      ) : (
+        <form onSubmit={handleSubmit}>
         <div className="row g-4 g-lg-5">
           {/* Main Form Left Column */}
           <div className="col-lg-8">
@@ -519,6 +556,7 @@ export const JoinQueue = () => {
           </div>
         </div>
       </form>
+      )}
     </div>
   );
 };

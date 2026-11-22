@@ -1,6 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import { QueueTicket, Barber, Service } from '../models/index.js';
+import { QueueTicket, Barber, Service, SalonSetting } from '../models/index.js';
 
 const router = express.Router();
 
@@ -373,6 +373,16 @@ router.post('/:id/no-show', async (req, res) => {
  */
 router.post('/join', async (req, res) => {
   try {
+    // 0. Master Queue Switch check
+    const settings = await SalonSetting.getSettings();
+    if (!settings.isQueueOpen) {
+      return res.status(403).json({
+        success: false,
+        queueClosed: true,
+        message: 'Online joining is closed for today. Walk-ins are still welcome at the salon.',
+      });
+    }
+
     const { customerName, phone, services, preferredBarber } = req.body;
 
     // 1. Validation

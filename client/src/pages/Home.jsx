@@ -32,10 +32,12 @@ export const Home = () => {
 
     const handleQueueUpdated = () => fetchStatus();
     socket.on('queue:updated', handleQueueUpdated);
+    socket.on('salon:status-changed', handleQueueUpdated);
     const interval = setInterval(fetchStatus, 15000);
 
     return () => {
       socket.off('queue:updated', handleQueueUpdated);
+      socket.off('salon:status-changed', handleQueueUpdated);
       clearInterval(interval);
     };
   }, []);
@@ -96,13 +98,13 @@ export const Home = () => {
             className="px-3 py-2 rounded-pill d-inline-flex align-items-center gap-2"
             style={{
               background: 'rgba(14, 14, 18, 0.75)',
-              border: '1px solid rgba(46, 160, 67, 0.35)',
+              border: `1px solid ${liveStatus?.isQueueOpen !== false ? 'rgba(46, 160, 67, 0.35)' : 'rgba(217, 119, 6, 0.4)'}`,
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
             }}
           >
-            <span className="dot-indicator dot-free"></span>
+            <span className={`dot-indicator ${liveStatus?.isQueueOpen !== false ? 'dot-free' : 'dot-break'}`}></span>
             <span className="fw-semibold small" style={{ color: 'var(--heading-color)' }}>
-              {t('salonOpen')}
+              {liveStatus?.isQueueOpen !== false ? t('salonOpen') : 'Queue Closed'}
             </span>
           </div>
         </div>
@@ -200,17 +202,33 @@ export const Home = () => {
 
         {/* Prominent Call to Action */}
         <div className="mt-4 pt-2 mx-auto" style={{ maxWidth: '480px' }}>
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Link
-              to="/join"
-              className="btn btn-gold btn-lg w-100 py-3 fs-5 d-flex align-items-center justify-content-center gap-2 shadow-lg"
-              style={{ borderRadius: '12px' }}
-            >
-              <i className="bi bi-person-plus-fill"></i>
-              <span>{t('joinQueue')}</span>
-              <i className="bi bi-arrow-right ms-1"></i>
-            </Link>
-          </motion.div>
+          {liveStatus?.isQueueOpen !== false ? (
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Link
+                to="/join"
+                className="btn btn-gold btn-lg w-100 py-3 fs-5 d-flex align-items-center justify-content-center gap-2 shadow-lg"
+                style={{ borderRadius: '12px' }}
+              >
+                <i className="bi bi-person-plus-fill"></i>
+                <span>{t('joinQueue')}</span>
+                <i className="bi bi-arrow-right ms-1"></i>
+              </Link>
+            </motion.div>
+          ) : (
+            <div>
+              <button
+                disabled
+                className="btn btn-outline-secondary btn-lg w-100 py-3 fs-5 d-flex align-items-center justify-content-center gap-2 mb-2"
+                style={{ borderRadius: '12px', opacity: 0.75, cursor: 'not-allowed' }}
+              >
+                <i className="bi bi-door-closed text-warning"></i>
+                <span className="text-white">Online Queue Closed</span>
+              </button>
+              <p className="small mb-0 text-center" style={{ color: 'var(--amber-warning)' }}>
+                Online joining is closed for today. Walk-ins are still welcome at the salon.
+              </p>
+            </div>
+          )}
         </div>
       </motion.div>
 

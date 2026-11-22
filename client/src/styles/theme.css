@@ -744,6 +744,67 @@ p, .lead, small, span, div {
   animation: tvStationGoldFlash 3.5s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
 
+/* Owner Settings PIN Keypad & Shake Animations */
+@keyframes pinShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-10px);
+  }
+  40%, 80% {
+    transform: translateX(10px);
+  }
+}
+
+.pin-shake {
+  animation: pinShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.pin-keypad-btn {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: rgba(22, 22, 28, 0.85);
+  border: 1px solid var(--border-color);
+  color: var(--heading-color);
+  font-size: 1.4rem;
+  font-weight: 600;
+  font-family: 'Jost', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.pin-keypad-btn:hover {
+  background: var(--gold-gradient-subtle);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  transform: scale(1.05);
+}
+
+.pin-keypad-btn:active {
+  transform: scale(0.95);
+  background: rgba(229, 195, 120, 0.25);
+}
+
+.pin-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  transition: all 0.2s ease;
+}
+
+.pin-dot.filled {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 10px rgba(229, 195, 120, 0.6);
+  transform: scale(1.15);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

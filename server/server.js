@@ -7,6 +7,8 @@ import dotenv from 'dotenv';
 import salonRoutes from './routes/salonRoutes.js';
 import queueRoutes from './routes/queueRoutes.js';
 import barberRoutes from './routes/barberRoutes.js';
+import serviceRoutes from './routes/serviceRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 import { seedDatabase } from './seeds/seedData.js';
 
 dotenv.config();
@@ -51,13 +53,10 @@ app.use((req, res, next) => {
 
 // 3. API Routes
 app.use('/api/salon', salonRoutes);
-app.use('/api/services', (req, res, next) => {
-  // redirect or forward to salon/services
-  req.url = '/services';
-  salonRoutes(req, res, next);
-});
+app.use('/api/services', serviceRoutes);
 app.use('/api/barbers', barberRoutes);
 app.use('/api/queue', queueRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health Check Endpoint
 app.get('/api/health', (req, res) => {

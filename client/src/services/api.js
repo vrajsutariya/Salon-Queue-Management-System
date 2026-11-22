@@ -193,4 +193,149 @@ export const api = {
     if (!res.ok) throw new Error('Failed to fetch barber details');
     return res.json();
   },
+
+  // --- Admin & Owner Controls ---
+  async verifyAdminPin(pin) {
+    const res = await fetch(`${API_BASE_URL}/api/admin/verify-pin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ pin }),
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
+
+  async getAdminSettings() {
+    const res = await fetch(`${API_BASE_URL}/api/admin/settings`);
+    if (!res.ok) throw new Error('Failed to fetch admin settings');
+    return res.json();
+  },
+
+  async getAdminStats() {
+    const res = await fetch(`${API_BASE_URL}/api/admin/stats`);
+    if (!res.ok) throw new Error('Failed to fetch admin stats');
+    return res.json();
+  },
+
+  async toggleQueue(isQueueOpen) {
+    const res = await fetch(`${API_BASE_URL}/api/admin/queue-toggle`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ isQueueOpen }),
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
+
+  async getAllServices() {
+    const res = await fetch(`${API_BASE_URL}/api/services?all=true`);
+    if (!res.ok) throw new Error('Failed to fetch all services');
+    return res.json();
+  },
+
+  async addService(payload) {
+    const res = await fetch(`${API_BASE_URL}/api/services`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
+
+  async updateService(id, payload) {
+    const res = await fetch(`${API_BASE_URL}/api/services/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
+
+  async deleteService(id) {
+    const res = await fetch(`${API_BASE_URL}/api/services/${id}`, {
+      method: 'DELETE',
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
+
+  async getAllBarbers() {
+    const res = await fetch(`${API_BASE_URL}/api/barbers?all=true`);
+    if (!res.ok) throw new Error('Failed to fetch all barbers');
+    return res.json();
+  },
+
+  async addBarber(payload) {
+    const res = await fetch(`${API_BASE_URL}/api/barbers`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
+
+  async updateBarber(id, payload) {
+    const res = await fetch(`${API_BASE_URL}/api/barbers/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
+
+  async deleteBarber(id) {
+    const res = await fetch(`${API_BASE_URL}/api/barbers/${id}`, {
+      method: 'DELETE',
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
 };

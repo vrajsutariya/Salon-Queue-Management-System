@@ -1,5 +1,5 @@
 import express from 'express';
-import { Barber, Service, QueueTicket } from '../models/index.js';
+import { Barber, Service, QueueTicket, SalonSetting } from '../models/index.js';
 
 const router = express.Router();
 
@@ -9,6 +9,9 @@ const router = express.Router();
  */
 router.get('/live-status', async (req, res) => {
   try {
+    // 0. Get salon settings
+    const settings = await SalonSetting.getSettings();
+
     // 1. Get on-duty barbers
     const activeBarbers = await Barber.find({ isOnDuty: true }).select('name photo status isOnDuty');
     const activeBarbersCount = Math.max(1, activeBarbers.length);
@@ -41,8 +44,10 @@ router.get('/live-status', async (req, res) => {
 
     res.json({
       success: true,
-      salonStatus: 'Open · Closes 9 PM',
-      isOpen: true,
+      salonStatus: settings.isQueueOpen ? `Open · Closes ${settings.closingTime || '9 PM'}` : 'Online Queue Closed',
+      isOpen: settings.isQueueOpen,
+      isQueueOpen: settings.isQueueOpen,
+      closingTime: settings.closingTime,
       waitingCount,
       calledCount,
       inChairCount,
