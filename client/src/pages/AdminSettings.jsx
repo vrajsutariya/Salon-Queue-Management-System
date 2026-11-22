@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { api } from '../services/api';
 import { socket } from '../services/socket';
-import { BarberAvatar } from '../components/BarberAvatar';
+import { BarberAvatar, BARBER_AVATAR_PRESETS } from '../components/BarberAvatar';
 import { BrandLogo } from '../components/BrandLogo';
 
 /**
@@ -279,7 +279,7 @@ export const AdminSettings = () => {
     setEditingBarber(null);
     setBarberForm({
       name: '',
-      avatarPreset: 'Ravi',
+      avatarPreset: 'Sameer',
       isOnDuty: true,
     });
     setShowBarberModal(true);
@@ -287,9 +287,23 @@ export const AdminSettings = () => {
 
   const handleOpenEditBarber = (barber) => {
     setEditingBarber(barber);
+    // Find matching preset by photo or name, strictly ignoring any legacy http/https URL
+    let matchedPreset = 'Ravi';
+    if (barber.photo && typeof barber.photo === 'string' && !barber.photo.startsWith('http')) {
+      const found = BARBER_AVATAR_PRESETS.find(
+        (p) => p.id.toLowerCase() === barber.photo.toLowerCase()
+      );
+      if (found) matchedPreset = found.id;
+    } else if (barber.name) {
+      const found = BARBER_AVATAR_PRESETS.find(
+        (p) => p.name.toLowerCase() === barber.name.toLowerCase()
+      );
+      if (found) matchedPreset = found.id;
+    }
+
     setBarberForm({
       name: barber.name || '',
-      avatarPreset: barber.name || 'Ravi',
+      avatarPreset: matchedPreset,
       isOnDuty: barber.isOnDuty !== false,
     });
     setShowBarberModal(true);
@@ -381,10 +395,10 @@ export const AdminSettings = () => {
             className="salon-heading mb-1 text-white"
             style={{ fontFamily: "'Fraunces', serif", fontSize: '1.85rem' }}
           >
-            Owner Access
+            {t('enterPin')}
           </h2>
           <p className="text-secondary small mb-4">
-            Enter 4-digit security PIN to unlock salon configuration
+            {t('pinSubtitle')}
           </p>
 
           {/* Masked PIN 4-Dot Indicators */}
@@ -474,7 +488,7 @@ export const AdminSettings = () => {
           </div>
 
           <div className="text-secondary small mt-3 border-top pt-3" style={{ borderColor: 'var(--border-color)', fontSize: '0.76rem' }}>
-            Default factory access code: <span className="fw-bold" style={{ color: 'var(--accent-color)' }}>1234</span>
+            {t('defaultPinHint')}
           </div>
         </motion.div>
       </div>
@@ -526,10 +540,10 @@ export const AdminSettings = () => {
             className="salon-heading mb-0 text-white"
             style={{ fontFamily: "'Fraunces', serif", fontSize: '2rem' }}
           >
-            Salon Operations & Settings
+            {t('ownerSettings')}
           </h1>
           <p className="text-secondary small mb-0">
-            Master queue controls, staff on-duty roster, and live service catalog pricing.
+            {t('adminSubtitle')}
           </p>
         </div>
 
@@ -540,10 +554,10 @@ export const AdminSettings = () => {
             onClick={handleLogout}
             className="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2 rounded-pill"
             style={{ minHeight: '44px' }}
-            title="Lock dashboard and end session"
+            title={t('lockSession')}
           >
             <i className="bi bi-lock-fill text-warning"></i>
-            <span className="small fw-semibold text-white">Lock / Logout</span>
+            <span className="small fw-semibold text-white">{t('lockSession')}</span>
           </button>
         </div>
       </div>
@@ -554,7 +568,7 @@ export const AdminSettings = () => {
         <div className="col-6 col-lg-3">
           <div className="salon-card p-3 p-md-4 h-100">
             <span className="text-secondary small d-block mb-1 text-uppercase" style={{ fontSize: '0.72rem', letterSpacing: '0.08em' }}>
-              Customers Served
+              {t('customersServed')}
             </span>
             <div className="d-flex align-items-baseline gap-2">
               <span className="display-6 fw-bold" style={{ fontFamily: "'Fraunces', serif", color: 'var(--accent-color)' }}>
@@ -572,13 +586,13 @@ export const AdminSettings = () => {
         <div className="col-6 col-lg-3">
           <div className="salon-card p-3 p-md-4 h-100">
             <span className="text-secondary small d-block mb-1 text-uppercase" style={{ fontSize: '0.72rem', letterSpacing: '0.08em' }}>
-              Avg Wait Time
+              {t('avgWaitTime')}
             </span>
             <div className="d-flex align-items-baseline gap-2">
               <span className="display-6 fw-bold" style={{ fontFamily: "'Fraunces', serif", color: 'var(--amber-warning)' }}>
                 ~{stats.avgWaitTimeMinutes}
               </span>
-              <span className="small text-secondary">mins</span>
+              <span className="small text-secondary">{t('minutes')}</span>
             </div>
             <small className="text-secondary d-block mt-2">
               <i className="bi bi-clock-history me-1 text-warning"></i> Join to chair call
@@ -590,7 +604,7 @@ export const AdminSettings = () => {
         <div className="col-6 col-lg-3">
           <div className="salon-card p-3 p-md-4 h-100">
             <span className="text-secondary small d-block mb-1 text-uppercase" style={{ fontSize: '0.72rem', letterSpacing: '0.08em' }}>
-              No-Show Count
+              {t('noShowsCount')}
             </span>
             <div className="d-flex align-items-baseline gap-2">
               <span className="display-6 fw-bold" style={{ fontFamily: "'Fraunces', serif", color: stats.noShowCount > 0 ? 'var(--color-danger)' : 'var(--text-secondary)' }}>
@@ -608,7 +622,7 @@ export const AdminSettings = () => {
         <div className="col-6 col-lg-3">
           <div className="salon-card p-3 p-md-4 h-100">
             <span className="text-secondary small d-block mb-1 text-uppercase" style={{ fontSize: '0.72rem', letterSpacing: '0.08em' }}>
-              Today's Revenue
+              {t('todayRevenue')}
             </span>
             <div className="d-flex align-items-baseline gap-2">
               <span className="display-6 fw-bold" style={{ fontFamily: "'Fraunces', serif", color: 'var(--color-success)' }}>
@@ -634,7 +648,7 @@ export const AdminSettings = () => {
           <div>
             <div className="d-flex align-items-center gap-2 mb-1">
               <h3 className="salon-heading text-white mb-0" style={{ fontSize: '1.35rem' }}>
-                Master Online Queue Control
+                {t('masterQueueSwitch')}
               </h3>
               <span className={`badge ${settings.isQueueOpen ? 'badge-status-in-chair' : 'badge-status-waiting'} px-3 py-1 rounded-pill`}>
                 {settings.isQueueOpen ? 'Queue is OPEN' : 'Queue is CLOSED'}
@@ -642,8 +656,8 @@ export const AdminSettings = () => {
             </div>
             <p className="text-secondary small mb-0" style={{ maxWidth: '620px' }}>
               {settings.isQueueOpen
-                ? 'Customers can join the queue online from home. When closed, remote sign-ups are paused while Reception walk-ins remain active.'
-                : 'Online joining is paused. New clients on the website will be advised to walk in directly.'}
+                ? t('queueIsOpenMsg')
+                : t('queueIsClosedMsg')}
             </p>
           </div>
 
@@ -657,7 +671,7 @@ export const AdminSettings = () => {
               style={{ minHeight: '48px', borderRadius: '12px' }}
             >
               <i className={`bi ${settings.isQueueOpen ? 'bi-pause-circle-fill' : 'bi-play-circle-fill'} fs-5`}></i>
-              <span>{settings.isQueueOpen ? 'Close Online Queue' : 'Open Online Queue'}</span>
+              <span>{settings.isQueueOpen ? t('toggleQueueBtnOpen') : t('toggleQueueBtnClosed')}</span>
             </button>
           </div>
         </div>
@@ -669,7 +683,7 @@ export const AdminSettings = () => {
           <div className="d-flex align-items-center gap-2">
             <i className="bi bi-people-fill fs-4" style={{ color: 'var(--accent-color)' }}></i>
             <h3 className="salon-heading text-white mb-0" style={{ fontSize: '1.35rem' }}>
-              Stylist Roster & Duty Schedule
+              {t('barberRosterManagement')}
             </h3>
           </div>
           <button
@@ -678,7 +692,7 @@ export const AdminSettings = () => {
             className="btn btn-gold btn-sm d-flex align-items-center gap-2 px-3 py-2 rounded-pill"
           >
             <i className="bi bi-person-plus-fill"></i>
-            <span>+ Add New Barber</span>
+            <span>{t('addBarber')}</span>
           </button>
         </div>
 
@@ -697,12 +711,22 @@ export const AdminSettings = () => {
                 <div>
                   <div className="d-flex align-items-center justify-content-between mb-3">
                     <div className="d-flex align-items-center gap-3">
-                      <BarberAvatar
-                        name={barber.name}
-                        size="md"
-                        status={barber.status}
-                        active={barber.isOnDuty}
-                      />
+                      <div className="text-center" style={{ flexShrink: 0 }}>
+                        <BarberAvatar
+                          name={barber.name}
+                          photo={barber.photo}
+                          size="md"
+                          status={barber.status}
+                          active={barber.isOnDuty}
+                        />
+                        <div
+                          className="fw-semibold text-white mt-1 text-truncate"
+                          style={{ fontSize: '0.75rem', maxWidth: '56px' }}
+                          title={barber.name}
+                        >
+                          {barber.name}
+                        </div>
+                      </div>
                       <div>
                         <h5 className="salon-heading text-white mb-0" style={{ fontSize: '1.15rem' }}>
                           Barber {barber.name}
@@ -965,6 +989,7 @@ export const AdminSettings = () => {
           <div className="glass-modal-backdrop">
             <motion.div
               className="glass-modal p-4"
+              style={{ maxWidth: '640px', maxHeight: '92vh', overflowY: 'auto' }}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -995,31 +1020,151 @@ export const AdminSettings = () => {
                   />
                 </div>
 
-                {/* Vector Avatar Preset Selection */}
-                <div className="mb-3">
-                  <label className="form-label text-white small fw-semibold d-block">
-                    Vector Avatar Style
-                  </label>
-                  <div className="d-flex gap-3 justify-content-center py-2">
-                    {['Ravi', 'Amit', 'Imran', 'Any'].map((preset) => (
+                {/* Live Vector Avatar & Name Preview */}
+                {(() => {
+                  const selectedPresetObj = BARBER_AVATAR_PRESETS.find(
+                    (p) => p.id.toLowerCase() === (barberForm.avatarPreset || '').toLowerCase()
+                  ) || BARBER_AVATAR_PRESETS[0];
+                  const safePresetName = selectedPresetObj?.name || 'Ravi';
+                  const displayName = barberForm.name.trim() || 'New Stylist';
+
+                  return (
+                    <>
                       <div
-                        key={preset}
-                        onClick={() => setBarberForm({ ...barberForm, avatarPreset: preset })}
-                        className="text-center cursor-pointer p-2 rounded-3"
+                        className="d-flex align-items-center gap-3 p-3 mb-3 rounded-3"
                         style={{
-                          border: barberForm.avatarPreset === preset ? '2px solid var(--accent-color)' : '1px solid transparent',
-                          backgroundColor: barberForm.avatarPreset === preset ? 'rgba(229, 195, 120, 0.12)' : 'transparent',
-                          cursor: 'pointer',
+                          backgroundColor: 'rgba(18, 18, 24, 0.85)',
+                          border: '1px solid rgba(229, 195, 120, 0.3)',
                         }}
                       >
-                        <BarberAvatar name={preset} size="md" active={barberForm.avatarPreset === preset} />
-                        <small className="d-block text-secondary mt-1" style={{ fontSize: '0.72rem' }}>
-                          {preset}
-                        </small>
+                        <div className="text-center" style={{ flexShrink: 0 }}>
+                          <BarberAvatar
+                            name={displayName}
+                            photo={safePresetName}
+                            size="lg"
+                            active
+                          />
+                          <div
+                            className="fw-bold text-white mt-1 text-truncate"
+                            style={{ fontSize: '0.78rem', maxWidth: '72px' }}
+                            title={displayName}
+                          >
+                            {displayName}
+                          </div>
+                        </div>
+
+                        <div className="flex-grow-1">
+                          <div
+                            className="text-secondary small text-uppercase fw-semibold"
+                            style={{ fontSize: '0.7rem', letterSpacing: '0.05em' }}
+                          >
+                            {editingBarber ? 'Editing Stylist Profile' : 'New Stylist Profile'}
+                          </div>
+                          <h5 className="text-white mb-1" style={{ fontFamily: "'Fraunces', serif", fontSize: '1.25rem' }}>
+                            Barber {displayName}
+                          </h5>
+                          <div className="d-flex align-items-center gap-2">
+                            <span className="badge badge-gold px-2 py-0 small" style={{ fontSize: '0.72rem' }}>
+                              {selectedPresetObj.style}
+                            </span>
+                            <span className="small text-secondary" style={{ fontSize: '0.75rem' }}>
+                              {selectedPresetObj.tag}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
+
+                      {/* Vector Avatar Preset Selection Gallery */}
+                      <div className="mb-3">
+                        <div className="d-flex align-items-center justify-content-between mb-2">
+                          <label className="form-label text-white small fw-semibold mb-0">
+                            Vector Avatar Style <span className="text-secondary fw-normal">({BARBER_AVATAR_PRESETS.length} Vector Presets)</span>
+                          </label>
+                          <span className="badge badge-gold px-2 py-1 small" style={{ fontSize: '0.72rem' }}>
+                            Selected: {safePresetName}
+                          </span>
+                        </div>
+
+                        <div
+                          className="p-2 rounded-3 border"
+                          style={{
+                            backgroundColor: 'rgba(12, 12, 16, 0.7)',
+                            borderColor: 'var(--border-subtle)',
+                            maxHeight: '270px',
+                            overflowY: 'auto',
+                          }}
+                        >
+                          <div className="row g-2">
+                            {BARBER_AVATAR_PRESETS.map((preset) => {
+                              const isSelected = safePresetName === preset.id;
+                              return (
+                                <div key={preset.id} className="col-6 col-sm-4 col-md-3">
+                                  <div
+                                    onClick={() => setBarberForm({ ...barberForm, avatarPreset: preset.id })}
+                                    className="text-center p-2 rounded-3 h-100 position-relative transition-all"
+                                    style={{
+                                      border: isSelected
+                                        ? '2px solid var(--accent-color)'
+                                        : '1px solid rgba(255, 255, 255, 0.08)',
+                                      backgroundColor: isSelected
+                                        ? 'rgba(229, 195, 120, 0.14)'
+                                        : 'rgba(25, 25, 32, 0.5)',
+                                      cursor: 'pointer',
+                                      transition: 'all 0.18s ease',
+                                    }}
+                                  >
+                                    {/* Selected check pill */}
+                                    {isSelected && (
+                                      <div
+                                        className="position-absolute d-flex align-items-center justify-content-center rounded-circle"
+                                        style={{
+                                          top: '4px',
+                                          right: '4px',
+                                          width: '18px',
+                                          height: '18px',
+                                          backgroundColor: 'var(--accent-color)',
+                                          color: '#0A0A0A',
+                                          fontSize: '0.65rem',
+                                        }}
+                                      >
+                                        <i className="bi bi-check-lg fw-bold"></i>
+                                      </div>
+                                    )}
+
+                                    <div className="d-flex justify-content-center mb-1">
+                                      <BarberAvatar
+                                        name={preset.id}
+                                        photo={preset.id}
+                                        size="md"
+                                        active={isSelected}
+                                      />
+                                    </div>
+
+                                    {/* Preset Name Below Vector Image */}
+                                    <div
+                                      className="fw-bold text-white text-truncate mt-1"
+                                      style={{ fontSize: '0.8rem' }}
+                                      title={preset.name}
+                                    >
+                                      {preset.name}
+                                    </div>
+                                    <small
+                                      className="d-block text-secondary text-truncate"
+                                      style={{ fontSize: '0.67rem', lineHeight: 1.2 }}
+                                      title={preset.style}
+                                    >
+                                      {preset.style}
+                                    </small>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
 
                 <div className="form-check form-switch mb-4">
                   <input

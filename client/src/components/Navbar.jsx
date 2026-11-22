@@ -88,10 +88,10 @@ export const Navbar = () => {
             <span className="fw-semibold">{lang === 'en' ? 'ગુજરાતી' : 'English'}</span>
           </button>
 
-          {/* Mobile Hamburger Toggle */}
+          {/* Mobile Hamburger Toggle (strictly hidden on desktop d-lg-none) */}
           <button
             type="button"
-            className="btn btn-sm btn-outline-secondary d-lg-none d-flex align-items-center justify-content-center p-1 rounded-circle"
+            className="btn btn-sm btn-outline-secondary d-flex d-lg-none align-items-center justify-content-center p-1 rounded-circle"
             style={{ width: '36px', height: '36px' }}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle navigation menu"

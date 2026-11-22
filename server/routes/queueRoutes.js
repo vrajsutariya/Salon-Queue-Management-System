@@ -1,6 +1,11 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import { QueueTicket, Barber, Service, SalonSetting } from '../models/index.js';
+import {
+  isValidTransition,
+  checkAutoCloseStatus,
+  computeEstimatedWaitTime,
+} from '../utils/queueRules.js';
 
 const router = express.Router();
 
@@ -14,14 +19,12 @@ router.get('/', async (req, res) => {
     let filter = {};
 
     if (status === 'all') {
-      // return all tickets from today
       const startOfToday = new Date();
       startOfToday.setHours(0, 0, 0, 0);
       filter = { createdAt: { $gte: startOfToday } };
     } else if (status) {
       filter = { status };
     } else {
-      // default: active tickets (waiting, called, in-chair)
       filter = { status: { $in: ['waiting', 'called', 'in-chair'] } };
     }
 
@@ -54,6 +57,8 @@ router.get('/', async (req, res) => {
 /**
  * POST /api/queue/call-next
  * Allocation algorithm: Assign next waiting customer to a specific barber
+ * Preference rule: Barber Amit only calls customers requesting Amit or "Any".
+ * Strictly skips customers requesting Ravi or Imran!
  */
 router.post('/call-next', async (req, res) => {
   try {
@@ -96,15 +101,13 @@ router.post('/call-next', async (req, res) => {
       });
     }
 
-    // Self-heal: If barber was marked busy but has no active tickets, ensure they are free to take customers
+    // Self-heal: If barber was marked busy but has no active tickets, ensure they are free
     if (barber.status === 'busy') {
       barber.status = 'free';
       await barber.save();
     }
 
     // 3. Selection Rule:
-    // Find the earliest customer with status 'waiting' where:
-    // preferredBarber == barberId OR preferredBarber matches barber.name OR preferredBarber == "any"
     // Strict rule: A customer who requested Ravi must NEVER be called by Amit or Imran!
     const candidateTicket = await QueueTicket.findOne({
       status: 'waiting',
@@ -178,6 +181,8 @@ router.post('/call-next', async (req, res) => {
 /**
  * POST /api/queue/walkin
  * Reception desk walk-in customer addition
+ * Note: If a previously marked no-show client returns, adding them creates
+ * a fresh token at the very end of the queue.
  */
 router.post('/walkin', async (req, res) => {
   try {
@@ -213,7 +218,7 @@ router.post('/walkin', async (req, res) => {
       });
     }
 
-    // 2. Active spot check
+    // 2. Active spot check (only waiting, called, in-chair block duplicates; no-show/cancelled can re-add)
     const existingActiveTicket = await QueueTicket.findOne({
       phone: cleanPhone,
       status: { $in: ['waiting', 'called', 'in-chair'] },
@@ -241,7 +246,7 @@ router.post('/walkin', async (req, res) => {
       });
     }
 
-    // 4. Token sequence
+    // 4. Token sequence for today
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
@@ -251,9 +256,9 @@ router.post('/walkin', async (req, res) => {
 
     const token = `S-${todayCount + 1}`;
 
-    // 5. Calculate wait estimate
+    // 5. Calculate wait estimate with ceil formula
     const activeBarbers = await Barber.find({ isOnDuty: true });
-    const activeBarbersCount = Math.max(1, activeBarbers.length);
+    const activeBarbersCount = activeBarbers.length;
 
     const ticketsAhead = await QueueTicket.find({
       status: { $in: ['waiting', 'called'] },
@@ -266,9 +271,9 @@ router.post('/walkin', async (req, res) => {
       });
     });
 
-    const estimatedWaitTimeMinutes = Math.round(minutesAhead / activeBarbersCount);
+    const estimatedWaitTimeMinutes = computeEstimatedWaitTime(minutesAhead, activeBarbersCount) ?? 0;
 
-    // 6. Create ticket
+    // 6. Create fresh ticket at the end of the queue
     const newTicket = new QueueTicket({
       token,
       customerName: customerName.trim(),
@@ -306,75 +311,15 @@ router.post('/walkin', async (req, res) => {
 });
 
 /**
- * POST /api/queue/:id/no-show
- * Mark a ticket as no-show and release the barber
- */
-router.post('/:id/no-show', async (req, res) => {
-  try {
-    const { id } = req.params;
-    let ticket = null;
-
-    if (mongoose.Types.ObjectId.isValid(id)) {
-      ticket = await QueueTicket.findById(id).populate('assignedBarber');
-    } else {
-      ticket = await QueueTicket.findOne({ token: id }).populate('assignedBarber');
-    }
-
-    if (!ticket) {
-      return res.status(404).json({ success: false, message: 'Ticket not found.' });
-    }
-
-    ticket.status = 'no-show';
-    await ticket.save();
-
-    // Release barber back to free if assigned and no other in-chair tickets
-    if (ticket.assignedBarber) {
-      const barberId = ticket.assignedBarber._id;
-      const otherActive = await QueueTicket.findOne({
-        _id: { $ne: ticket._id },
-        assignedBarber: barberId,
-        status: { $in: ['called', 'in-chair'] },
-      });
-
-      if (!otherActive) {
-        await Barber.findByIdAndUpdate(barberId, { status: 'free' });
-        if (req.io) {
-          req.io.emit('barber:updated', { barberId, status: 'free' });
-        }
-      }
-    }
-
-    if (req.io) {
-      req.io.emit('queue:updated', {
-        action: 'no_show',
-        ticketId: ticket._id,
-        token: ticket.token,
-      });
-      req.io.emit('ticket:no-show', {
-        ticketId: ticket._id,
-        token: ticket.token,
-      });
-    }
-
-    res.json({
-      success: true,
-      message: `Ticket ${ticket.token} marked as no-show.`,
-      ticket,
-    });
-  } catch (error) {
-    console.error('Error marking no-show:', error);
-    res.status(500).json({ success: false, message: 'Server error marking no-show.' });
-  }
-});
-
-/**
  * POST /api/queue/join
- * Join the digital walk-in queue
+ * Join the digital walk-in queue online
+ * Auto-closes if within 30 minutes of salon closing
  */
 router.post('/join', async (req, res) => {
   try {
-    // 0. Master Queue Switch check
+    // 0. Master Queue Switch check from Admin settings
     const settings = await SalonSetting.getSettings();
+
     if (!settings.isQueueOpen) {
       return res.status(403).json({
         success: false,
@@ -453,9 +398,9 @@ router.post('/join', async (req, res) => {
 
     const token = `S-${todayCount + 1}`;
 
-    // 5. Calculate wait time ahead
+    // 5. Calculate wait time ahead using ceil formula
     const activeBarbers = await Barber.find({ isOnDuty: true });
-    const activeBarbersCount = Math.max(1, activeBarbers.length);
+    const activeBarbersCount = activeBarbers.length;
 
     const ticketsAhead = await QueueTicket.find({
       status: { $in: ['waiting', 'called'] },
@@ -468,7 +413,7 @@ router.post('/join', async (req, res) => {
       });
     });
 
-    const estimatedWaitTimeMinutes = Math.round(minutesAhead / activeBarbersCount);
+    const estimatedWaitTimeMinutes = computeEstimatedWaitTime(minutesAhead, activeBarbersCount) ?? 0;
 
     // 6. Create ticket
     const newTicket = new QueueTicket({
@@ -508,7 +453,7 @@ router.post('/join', async (req, res) => {
 
 /**
  * GET /api/queue/:id
- * Retrieve live status for a specific ticket
+ * Retrieve live status for a specific ticket with accurate dynamic wait time
  */
 router.get('/:id', async (req, res) => {
   try {
@@ -536,24 +481,95 @@ router.get('/:id', async (req, res) => {
       position = 1;
     }
 
-    // Calculate dynamic wait time
-    const activeBarbers = await Barber.find({ isOnDuty: true });
-    const activeBarbersCount = Math.max(1, activeBarbers.length);
-
+    // Dynamic wait time math
     let waitTime = 0;
-    if (ticket.status === 'waiting') {
-      const ticketsAhead = await QueueTicket.find({
-        status: 'waiting',
-        joinedAt: { $lt: ticket.joinedAt },
-      }).populate('services');
+    let barbersUnavailable = false;
 
-      let mins = 0;
-      ticketsAhead.forEach((t) => {
-        t.services?.forEach((s) => {
-          mins += s.durationMinutes || 0;
-        });
-      });
-      waitTime = Math.round(mins / activeBarbersCount);
+    if (ticket.status === 'waiting') {
+      if (ticket.preferredBarber && ticket.preferredBarber !== 'any') {
+        // Specific barber calculation
+        let targetBarber = null;
+        if (mongoose.Types.ObjectId.isValid(ticket.preferredBarber)) {
+          targetBarber = await Barber.findById(ticket.preferredBarber);
+        } else {
+          targetBarber = await Barber.findOne({ name: new RegExp(`^${ticket.preferredBarber}$`, 'i') });
+        }
+
+        if (!targetBarber || !targetBarber.isOnDuty) {
+          barbersUnavailable = true;
+          waitTime = null;
+        } else {
+          let minsAhead = 0;
+
+          // In-chair time remaining for this barber
+          const activeChairTicket = await QueueTicket.findOne({
+            assignedBarber: targetBarber._id,
+            status: 'in-chair',
+          }).populate('services');
+
+          if (activeChairTicket) {
+            let totalDur = 0;
+            activeChairTicket.services?.forEach((s) => (totalDur += s.durationMinutes || 0));
+            const elapsed = activeChairTicket.inChairAt
+              ? Math.floor((new Date() - new Date(activeChairTicket.inChairAt)) / 60000)
+              : 0;
+            minsAhead += Math.max(0, totalDur - elapsed);
+          }
+
+          // Tickets ahead for this barber OR any
+          const aheadList = await QueueTicket.find({
+            status: { $in: ['waiting', 'called'] },
+            joinedAt: { $lt: ticket.joinedAt },
+            $or: [
+              { preferredBarber: 'any' },
+              { preferredBarber: { $regex: new RegExp(`^${targetBarber.name}$`, 'i') } },
+              { preferredBarber: targetBarber._id.toString() },
+              { preferredBarber: targetBarber._id },
+            ],
+          }).populate('services');
+
+          aheadList.forEach((t) => {
+            t.services?.forEach((s) => {
+              minsAhead += s.durationMinutes || 0;
+            });
+          });
+
+          waitTime = computeEstimatedWaitTime(minsAhead, 1);
+        }
+      } else {
+        // General calculation ("any")
+        const activeBarbers = await Barber.find({ isOnDuty: true });
+        const activeBarbersCount = activeBarbers.length;
+
+        if (activeBarbersCount === 0) {
+          barbersUnavailable = true;
+          waitTime = null;
+        } else {
+          let minsAhead = 0;
+
+          // In-chair remaining times
+          const inChairTickets = await QueueTicket.find({ status: 'in-chair' }).populate('services');
+          inChairTickets.forEach((t) => {
+            let dur = 0;
+            t.services?.forEach((s) => (dur += s.durationMinutes || 0));
+            const elapsed = t.inChairAt ? Math.floor((new Date() - new Date(t.inChairAt)) / 60000) : 0;
+            minsAhead += Math.max(0, dur - elapsed);
+          });
+
+          const aheadList = await QueueTicket.find({
+            status: { $in: ['waiting', 'called'] },
+            joinedAt: { $lt: ticket.joinedAt },
+          }).populate('services');
+
+          aheadList.forEach((t) => {
+            t.services?.forEach((s) => {
+              minsAhead += s.durationMinutes || 0;
+            });
+          });
+
+          waitTime = computeEstimatedWaitTime(minsAhead, activeBarbersCount);
+        }
+      }
     }
 
     res.json({
@@ -561,6 +577,7 @@ router.get('/:id', async (req, res) => {
       ticket,
       position,
       estimatedWaitTimeMinutes: waitTime,
+      barbersUnavailable,
     });
   } catch (error) {
     console.error('Error fetching ticket status:', error);
@@ -570,7 +587,8 @@ router.get('/:id', async (req, res) => {
 
 /**
  * POST /api/queue/:id/cancel
- * Cancel a spot in the queue
+ * Abort path: waiting -> cancelled
+ * Strictly enforces that only 'waiting' tickets can be cancelled.
  */
 router.post('/:id/cancel', async (req, res) => {
   try {
@@ -595,17 +613,18 @@ router.post('/:id/cancel', async (req, res) => {
       });
     }
 
-    if (ticket.status === 'done') {
+    // State machine check: Only waiting can cancel
+    if (ticket.status !== 'waiting') {
       return res.status(400).json({
         success: false,
-        message: 'Completed services cannot be cancelled.',
+        message: `Cannot cancel ticket in "${ticket.status}" status. Only waiting tickets can be cancelled.`,
       });
     }
 
     ticket.status = 'cancelled';
     await ticket.save();
 
-    // Release barber if this ticket was assigned and barber has no other in-chair tickets
+    // Release barber if assigned
     if (ticket.assignedBarber) {
       const barberId = ticket.assignedBarber._id || ticket.assignedBarber;
       const otherActive = await QueueTicket.findOne({
@@ -621,7 +640,6 @@ router.post('/:id/cancel', async (req, res) => {
       }
     }
 
-    // Recalculate and emit socket updates
     if (req.io) {
       req.io.emit('queue:updated', {
         action: 'cancelled',
@@ -647,9 +665,80 @@ router.post('/:id/cancel', async (req, res) => {
 });
 
 /**
+ * POST /api/queue/:id/no-show
+ * Abort path: called -> no-show
+ * Strictly enforces that only 'called' tickets can be marked as no-show.
+ */
+router.post('/:id/no-show', async (req, res) => {
+  try {
+    const { id } = req.params;
+    let ticket = null;
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      ticket = await QueueTicket.findById(id).populate('assignedBarber');
+    } else {
+      ticket = await QueueTicket.findOne({ token: id }).populate('assignedBarber');
+    }
+
+    if (!ticket) {
+      return res.status(404).json({ success: false, message: 'Ticket not found.' });
+    }
+
+    // State machine check: Only called customers can be marked as no-show
+    if (ticket.status !== 'called') {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot mark as no-show. Ticket must be in "called" status (current: "${ticket.status}").`,
+      });
+    }
+
+    ticket.status = 'no-show';
+    await ticket.save();
+
+    // Release barber back to free
+    if (ticket.assignedBarber) {
+      const barberId = ticket.assignedBarber._id;
+      const otherActive = await QueueTicket.findOne({
+        _id: { $ne: ticket._id },
+        assignedBarber: barberId,
+        status: { $in: ['called', 'in-chair'] },
+      });
+
+      if (!otherActive) {
+        await Barber.findByIdAndUpdate(barberId, { status: 'free' });
+        if (req.io) {
+          req.io.emit('barber:updated', { barberId, status: 'free' });
+        }
+      }
+    }
+
+    if (req.io) {
+      req.io.emit('queue:updated', {
+        action: 'no_show',
+        ticketId: ticket._id,
+        token: ticket.token,
+      });
+      req.io.emit('ticket:no-show', {
+        ticketId: ticket._id,
+        token: ticket.token,
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `Ticket ${ticket.token} marked as no-show.`,
+      ticket,
+    });
+  } catch (error) {
+    console.error('Error marking no-show:', error);
+    res.status(500).json({ success: false, message: 'Server error marking no-show.' });
+  }
+});
+
+/**
  * POST /api/queue/:id/start
- * Updates ticket status to in-chair and starts elapsed service timer
- * Emits ticket:started and queue:updated
+ * Step transition: called -> in-chair
+ * Strictly enforces that only 'called' tickets can start service.
  */
 router.post('/:id/start', async (req, res) => {
   try {
@@ -666,10 +755,11 @@ router.post('/:id/start', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Ticket not found.' });
     }
 
-    if (ticket.status === 'done' || ticket.status === 'cancelled') {
+    // State machine check: Must be in "called" status
+    if (ticket.status !== 'called') {
       return res.status(400).json({
         success: false,
-        message: `Cannot start service for ticket in "${ticket.status}" status.`,
+        message: `Cannot start service. Customer must be in "called" status (current: "${ticket.status}").`,
       });
     }
 
@@ -734,8 +824,8 @@ router.post('/:id/start', async (req, res) => {
 
 /**
  * POST /api/queue/:id/done
- * Updates ticket status to done, sets barber status to free
- * Emits ticket:done and queue:updated
+ * Step transition: in-chair -> done
+ * Strictly enforces that only 'in-chair' tickets can be marked as done.
  */
 router.post('/:id/done', async (req, res) => {
   try {
@@ -750,6 +840,14 @@ router.post('/:id/done', async (req, res) => {
 
     if (!ticket) {
       return res.status(404).json({ success: false, message: 'Ticket not found.' });
+    }
+
+    // State machine check: Must be in-chair
+    if (ticket.status !== 'in-chair') {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot complete service. Customer must be "in-chair" (current: "${ticket.status}").`,
+      });
     }
 
     ticket.status = 'done';
@@ -768,7 +866,6 @@ router.post('/:id/done', async (req, res) => {
       if (!otherActive) {
         const barber = await Barber.findById(barberId);
         if (barber) {
-          // If barber was not manually put on break, return to free
           if (barber.status !== 'break') {
             barber.status = 'free';
             await barber.save();
@@ -824,20 +921,16 @@ router.post('/:id/done', async (req, res) => {
 
 /**
  * PATCH /api/queue/:id/status
- * Update ticket status (waiting, called, in-chair, done, no-show, cancelled)
+ * Update ticket status with strict State Machine validation
+ * Valid transitions:
+ * waiting -> called -> in-chair -> done
+ * Abort paths: waiting -> cancelled; called -> no-show
+ * Never backwards!
  */
 router.patch('/:id/status', async (req, res) => {
   try {
     const { id } = req.params;
     const { status, barberId, barberName } = req.body;
-
-    const validStatuses = ['waiting', 'called', 'in-chair', 'done', 'cancelled', 'no-show'];
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({
-        success: false,
-        message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`,
-      });
-    }
 
     let ticket = null;
     if (mongoose.Types.ObjectId.isValid(id)) {
@@ -848,6 +941,14 @@ router.patch('/:id/status', async (req, res) => {
 
     if (!ticket) {
       return res.status(404).json({ success: false, message: 'Ticket not found.' });
+    }
+
+    // Strict State Machine Check
+    if (!isValidTransition(ticket.status, status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid state transition from "${ticket.status}" to "${status}". Permitted transitions: waiting -> called -> in-chair -> done (abort: waiting -> cancelled, called -> no-show). Never backwards.`,
+      });
     }
 
     ticket.status = status;
@@ -872,7 +973,7 @@ router.patch('/:id/status', async (req, res) => {
 
     await ticket.save();
 
-    // If status transitioned to done, no-show, or cancelled, release barber back to free
+    // Release barber if transitioned to done, no-show, or cancelled
     if (['done', 'no-show', 'cancelled'].includes(status) && ticket.assignedBarber) {
       const bId = ticket.assignedBarber._id || ticket.assignedBarber;
       const otherActive = await QueueTicket.findOne({

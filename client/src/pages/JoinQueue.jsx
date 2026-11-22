@@ -141,6 +141,9 @@ export const JoinQueue = () => {
     }
   };
 
+  const isOnlineQueueClosed = liveStatus?.isQueueOpen === false;
+  const closingTimeDisplay = liveStatus?.closingTime || '9:00 PM';
+
   return (
     <div className="container py-4 py-md-5" style={{ maxWidth: '1060px' }}>
       {/* Top Breadcrumb & Heading with Breathing Room */}
@@ -175,7 +178,7 @@ export const JoinQueue = () => {
         </div>
       )}
 
-      {liveStatus?.isQueueOpen === false ? (
+      {isOnlineQueueClosed ? (
         <motion.div
           className="salon-card p-4 p-md-5 text-center my-4"
           initial={{ opacity: 0, scale: 0.96 }}
@@ -191,12 +194,12 @@ export const JoinQueue = () => {
           >
             <i className="bi bi-door-closed display-4 text-warning"></i>
           </div>
-          <h2 className="salon-heading text-white mb-2">Online Joining is Closed</h2>
+          <h2 className="salon-heading text-white mb-2">{t('onlineJoiningClosed')}</h2>
           <p className="text-secondary mx-auto mb-4" style={{ maxWidth: '520px', fontSize: '1.05rem' }}>
-            Online joining is closed for today. Walk-ins are still welcome at the salon. Please visit our front desk to take a spot.
+            {liveStatus?.autoCloseMessage || t('autoClosedNotice', { time: closingTimeDisplay })}
           </p>
           <Link to="/" className="btn btn-gold px-4 py-2">
-            <i className="bi bi-house me-1"></i> Return to Home
+            <i className="bi bi-house me-1"></i> {t('returnToHome')}
           </Link>
         </motion.div>
       ) : (
@@ -214,7 +217,7 @@ export const JoinQueue = () => {
               <div className="d-flex align-items-center gap-2 mb-3">
                 <i className="bi bi-person-circle fs-5" style={{ color: 'var(--accent-color)' }}></i>
                 <h5 className="salon-heading mb-0" style={{ fontSize: '1.25rem' }}>
-                  1. Customer Details
+                  {t('stepCustomerDetails')}
                 </h5>
               </div>
 
@@ -285,11 +288,11 @@ export const JoinQueue = () => {
                 <div className="d-flex align-items-center gap-2">
                   <i className="bi bi-card-checklist fs-5" style={{ color: 'var(--accent-color)' }}></i>
                   <h5 className="salon-heading mb-0" style={{ fontSize: '1.25rem' }}>
-                    2. {t('servicesTitle')}
+                    {t('stepServices')}
                   </h5>
                 </div>
                 <span className="badge badge-accent px-3 py-1 rounded-pill">
-                  {selectedServices.length}/3 Selected
+                  {t('selectedCount', { count: selectedServices.length })}
                 </span>
               </div>
               <p style={{ color: 'var(--text-secondary)' }} className="small mb-4">
@@ -364,7 +367,7 @@ export const JoinQueue = () => {
               )}
             </motion.div>
 
-            {/* 3. Barber Preference (Fully Working & Verified) */}
+            {/* 3. Barber Preference */}
             <motion.div
               className="salon-card p-4 p-md-5 mb-4"
               initial={{ opacity: 0, y: 15 }}
@@ -374,7 +377,7 @@ export const JoinQueue = () => {
               <div className="d-flex align-items-center gap-2 mb-2">
                 <i className="bi bi-scissors fs-5" style={{ color: 'var(--accent-color)' }}></i>
                 <h5 className="salon-heading mb-0" style={{ fontSize: '1.25rem' }}>
-                  3. {t('barberTitle')}
+                  {t('stepBarber')}
                 </h5>
               </div>
               <p style={{ color: 'var(--text-secondary)' }} className="small mb-4">
@@ -404,7 +407,9 @@ export const JoinQueue = () => {
                       />
                       <div>
                         <div className="fw-semibold text-white">{t('fastestAvailable')}</div>
-                        <small style={{ color: 'var(--text-secondary)' }}>First available chair</small>
+                        <small style={{ color: 'var(--text-secondary)' }}>
+                          {lang === 'gu' ? 'સૌથી ઝડપી વારો' : 'First available chair'}
+                        </small>
                       </div>
                     </div>
 
@@ -421,6 +426,13 @@ export const JoinQueue = () => {
                 {/* Option 2: Individual Barbers */}
                 {barbersList.map((barber) => {
                   const isSelected = preferredBarber === barber.name || preferredBarber === barber._id;
+                  const barberStatusLabel =
+                    barber.status === 'free'
+                      ? t('barber_free')
+                      : barber.status === 'busy'
+                      ? t('barber_busy')
+                      : t('barber_break');
+
                   return (
                     <div key={barber._id} className="col-12 col-md-6">
                       <div
@@ -438,6 +450,7 @@ export const JoinQueue = () => {
                         <div className="d-flex align-items-center gap-3">
                           <BarberAvatar
                             name={barber.name}
+                            photo={barber.photo}
                             size={48}
                             status={barber.status}
                             active={isSelected}
@@ -446,7 +459,7 @@ export const JoinQueue = () => {
                           <div>
                             <div className="fw-semibold text-white">{barber.name}</div>
                             <small className="text-capitalize" style={{ color: 'var(--text-secondary)' }}>
-                              Status: {barber.status}
+                              {barberStatusLabel}
                             </small>
                           </div>
                         </div>
@@ -506,7 +519,7 @@ export const JoinQueue = () => {
 
               {/* Preferred Stylist Highlight */}
               <div className="d-flex justify-content-between align-items-center p-2 mb-3 rounded-3" style={{ background: 'rgba(229, 195, 120, 0.08)', border: '1px solid rgba(229, 195, 120, 0.2)' }}>
-                <span className="small text-secondary fw-medium">Stylist:</span>
+                <span className="small text-secondary fw-medium">{lang === 'gu' ? 'વાળંદ:' : 'Stylist:'}</span>
                 <span className="badge badge-accent px-2 py-1">
                   {preferredBarber === 'any' ? t('fastestAvailable') : `Barber ${preferredBarber}`}
                 </span>
@@ -550,7 +563,9 @@ export const JoinQueue = () => {
               </button>
 
               <small className="text-center d-block mt-3" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Walk-ins pay offline at the desk upon service completion.
+                {lang === 'gu'
+                  ? 'સેવા પૂર્ણ થયા પછી ડેસ્ક પર ઓફલાઇન ચુકવણી કરવાની રહેશે.'
+                  : 'Walk-ins pay offline at the desk upon service completion.'}
               </small>
             </motion.div>
           </div>

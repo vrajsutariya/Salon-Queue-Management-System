@@ -234,15 +234,16 @@ export const MyStatus = () => {
             className="btn btn-sm btn-outline-gold py-1 px-2 rounded-circle"
             title={t('refresh')}
             aria-label={t('refresh')}
-            style={{ width: '32px', height: '32px' }}
+            style={{ minWidth: '44px', minHeight: '44px' }}
           >
             <i className="bi bi-arrow-clockwise"></i>
           </button>
           <button
             onClick={toggleLanguage}
-            className="btn btn-sm btn-outline-gold py-1 px-2 fw-bold"
+            className="btn btn-sm btn-outline-gold py-1 px-3 fw-bold"
             title="Switch Language"
             aria-label="Switch Language"
+            style={{ minHeight: '44px' }}
           >
             {lang === 'en' ? 'ગુજરાતી' : 'EN'}
           </button>
@@ -304,11 +305,8 @@ export const MyStatus = () => {
               <i className="bi bi-cup-hot-fill fs-3 text-warning"></i>
               <div>
                 <h6 className="fw-bold text-white mb-0">
-                  {preferredBarberObj.name} is on break
+                  {t('barberOnBreakNotice', { name: preferredBarberObj.name })}
                 </h6>
-                <small style={{ color: 'var(--text-secondary)' }}>
-                  Your requested stylist is currently taking a short break. You will be called as soon as they return!
-                </small>
               </div>
             </div>
           )}
@@ -448,11 +446,23 @@ export const MyStatus = () => {
 
                   {/* Center Content */}
                   <div className="circular-timer-center">
-                    <span className="circular-timer-time">
-                      {waitMinutes > 0 ? `~${waitMinutes}` : '0'}
-                      <span style={{ fontSize: '1rem', marginLeft: '3px' }}>{t('minutes')}</span>
-                    </span>
-                    <span className="circular-timer-caption">{t('estimatedWait')}</span>
+                    {ticketData?.barbersUnavailable ? (
+                      <span className="circular-timer-caption text-warning fw-semibold px-2">
+                        {t('barbersUnavailable')}
+                      </span>
+                    ) : waitMinutes !== null && waitMinutes !== undefined ? (
+                      <>
+                        <span className="circular-timer-time">
+                          {waitMinutes > 0 ? `~${waitMinutes}` : '0'}
+                          <span style={{ fontSize: '1rem', marginLeft: '3px' }}>{t('minutes')}</span>
+                        </span>
+                        <span className="circular-timer-caption">{t('estimatedWait')}</span>
+                      </>
+                    ) : (
+                      <span className="circular-timer-caption text-warning fw-semibold px-2">
+                        {t('estimatingWait')}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -470,6 +480,7 @@ export const MyStatus = () => {
                 <div className="d-flex align-items-center gap-3">
                   <BarberAvatar
                     name={ticket.assignedBarber?.name || ticket.preferredBarber}
+                    photo={ticket.assignedBarber?.photo}
                     size={44}
                     status={ticket.assignedBarber?.status}
                   />

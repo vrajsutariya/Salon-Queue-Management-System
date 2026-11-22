@@ -16,9 +16,19 @@ export const LanguageProvider = ({ children }) => {
     setLang((prev) => (prev === 'en' ? 'gu' : 'en'));
   };
 
-  const t = (key) => {
+  /**
+   * Translate key with optional parameter interpolation
+   * Example: t('goToBarber', { name: 'Ravi' }) -> "Go to Barber Ravi"
+   */
+  const t = (key, params = {}) => {
     const currentDict = translations[lang] || translations.en;
-    return currentDict[key] || translations.en[key] || key;
+    let str = currentDict[key] || translations.en[key] || key;
+    if (params && typeof params === 'object' && typeof str === 'string') {
+      Object.entries(params).forEach(([k, v]) => {
+        str = str.replace(new RegExp(`\\{${k}\\}`, 'g'), v !== undefined && v !== null ? v : '');
+      });
+    }
+    return str;
   };
 
   return (

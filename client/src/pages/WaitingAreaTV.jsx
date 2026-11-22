@@ -338,6 +338,7 @@ export const WaitingAreaTV = () => {
                       <div className="d-flex align-items-center gap-3 gap-xl-4">
                         <BarberAvatar
                           name={barber.name}
+                          photo={barber.photo}
                           size={80}
                           status={barber.status}
                           active={!!activeCust}
@@ -363,11 +364,11 @@ export const WaitingAreaTV = () => {
                             </div>
                           ) : isOnBreak ? (
                             <span className="small text-warning">
-                              <i className="bi bi-cup-hot me-1"></i> Taking a short break
+                              <i className="bi bi-cup-hot me-1"></i> {t('barber_break')}
                             </span>
                           ) : (
                             <span className="small" style={{ color: 'var(--text-secondary)' }}>
-                              Ready for next client
+                              {t('readyForNextClient')}
                             </span>
                           )}
                         </div>
@@ -404,9 +405,9 @@ export const WaitingAreaTV = () => {
                         ) : isOnBreak ? (
                           <div className="px-3 py-2 rounded-3 text-center" style={{ background: 'rgba(217, 119, 6, 0.15)', border: '1px solid var(--amber-warning)' }}>
                             <span className="fw-bold fs-5 text-warning d-block">
-                              On Break
+                              {t('barber_break')}
                             </span>
-                            <small className="text-secondary">Be back soon</small>
+                            <small className="text-secondary">{t('onBreakBeBack')}</small>
                           </div>
                         ) : (
                           <div className="px-3 py-2 rounded-3 text-center" style={{ background: 'rgba(229, 195, 120, 0.08)', border: '1px solid rgba(229, 195, 120, 0.25)' }}>
@@ -414,9 +415,9 @@ export const WaitingAreaTV = () => {
                               className="fw-bold fs-5 d-block"
                               style={{ color: 'var(--accent-color)', fontFamily: "'Fraunces', serif" }}
                             >
-                              Ready / Calling
+                              {t('chairAvailable')}
                             </span>
-                            <small className="text-secondary">Chair Available</small>
+                            <small className="text-secondary">{t('chairFree')}</small>
                           </div>
                         )}
                       </div>
@@ -450,11 +451,11 @@ export const WaitingAreaTV = () => {
                     color: 'var(--amber-warning)',
                   }}
                 >
-                  Up Next in Line
+                  {t('upNextInLine')}
                 </h2>
               </div>
               <span className="badge badge-status-waiting px-3 py-1 rounded-pill fs-6">
-                Next 5 in Queue
+                {t('next5InQueue')}
               </span>
             </div>
 
@@ -463,9 +464,9 @@ export const WaitingAreaTV = () => {
               <div className="text-center py-5 my-auto">
                 <i className="bi bi-check2-circle display-3 d-block mb-3 text-success opacity-50"></i>
                 <h4 className="text-white" style={{ fontFamily: "'Fraunces', serif" }}>
-                  Waiting Room Clear
+                  {t('waitingRoomClear')}
                 </h4>
-                <p className="text-secondary small">No customers currently waiting in the lounge.</p>
+                <p className="text-secondary small">{t('noCustomersInLounge')}</p>
               </div>
             ) : (
               <div className="d-flex flex-column gap-3 my-auto">

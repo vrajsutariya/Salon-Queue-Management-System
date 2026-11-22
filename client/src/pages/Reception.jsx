@@ -382,6 +382,7 @@ export const Reception = () => {
                         <div className="d-flex align-items-center gap-3">
                           <BarberAvatar
                             name={barber.name}
+                            photo={barber.photo}
                             size="sm"
                             status={barber.status}
                           />
@@ -476,7 +477,7 @@ export const Reception = () => {
                   </h5>
                 </div>
                 <small className="text-secondary">
-                  {tickets.length} total customers currently active in queue
+                  {t('totalActiveCustomers', { count: tickets.length })}
                 </small>
               </div>
 
@@ -515,8 +516,8 @@ export const Reception = () => {
             ) : filteredTickets.length === 0 ? (
               <div className="text-center py-5">
                 <i className="bi bi-inbox text-secondary display-5 d-block mb-3 opacity-50"></i>
-                <h6 className="text-white mb-1">{t('noWaitingCustomers')}</h6>
-                <p className="text-secondary small mb-4">New customers joining live will appear here instantaneously.</p>
+                <h6 className="text-white mb-1">{t('emptyWaitingReception')}</h6>
+                <p className="text-secondary small mb-4">{t('emptyWaitingDesc')}</p>
                 <button
                   type="button"
                   onClick={() => setShowWalkinModal(true)}
@@ -882,7 +883,7 @@ export const Reception = () => {
                 }}
                 className={`btn ${actionConfirm.type === 'no-show' ? 'btn-warning' : 'btn-danger'} px-4`}
               >
-                Confirm
+                {t('confirm')}
               </button>
             </div>
           </div>

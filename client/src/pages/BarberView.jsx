@@ -286,7 +286,7 @@ export const BarberView = () => {
                 flexShrink: 0,
               }}
             >
-              <BarberAvatar name={b.name} size="xs" status={b.status} active={isSelected} />
+              <BarberAvatar name={b.name} photo={b.photo} size="xs" status={b.status} active={isSelected} />
               <span className="fw-semibold">{b.name}</span>
               {b.status === 'break' && (
                 <span className="badge bg-warning text-dark px-1 py-0 small" style={{ fontSize: '0.68rem' }}>
@@ -314,6 +314,7 @@ export const BarberView = () => {
             <div className="d-flex align-items-center gap-3">
               <BarberAvatar
                 name={activeBarber.name}
+                photo={activeBarber.photo}
                 size="lg"
                 status={activeBarber.status}
                 active={isBusy}
@@ -336,7 +337,7 @@ export const BarberView = () => {
                   </span>
                 </div>
                 <div className="d-flex align-items-center gap-2 small text-secondary">
-                  <span>Styling Chair Console</span>
+                  <span>{t('stationConsole')}</span>
                   <span>•</span>
                   <span style={{ color: 'var(--accent-color)', fontFamily: 'monospace' }}>
                     {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
@@ -370,7 +371,7 @@ export const BarberView = () => {
                 }
               >
                 <i className={`bi ${isOnBreak ? 'bi-play-circle-fill text-success fs-5' : 'bi-pause-circle-fill text-warning fs-5'}`}></i>
-                <span>{isOnBreak ? 'End Break (Available)' : 'Take a Break'}</span>
+                <span>{isOnBreak ? t('barberFreeToggle') : t('barberBreakToggle')}</span>
               </button>
             </div>
           </div>
@@ -403,7 +404,7 @@ export const BarberView = () => {
               style={{ color: 'var(--accent-color)' }}
             ></i>
             <h3 className="salon-heading mb-0 text-white" style={{ fontSize: '1.35rem' }}>
-              {activeCustomer ? 'Active Customer in Chair' : 'Styling Chair Status'}
+              {activeCustomer ? t('activeInChair') : t('chairFree')}
             </h3>
           </div>
           {activeCustomer ? (
@@ -506,7 +507,7 @@ export const BarberView = () => {
                   }}
                 >
                   <i className="bi bi-play-fill fs-4"></i>
-                  <span>Start Service (Seat Customer in Chair)</span>
+                  <span>{t('startService')}</span>
                 </button>
               ) : (
                 <button
@@ -521,7 +522,7 @@ export const BarberView = () => {
                   }}
                 >
                   <i className="bi bi-check2-circle fs-4"></i>
-                  <span>Done / Complete Service (Free Chair)</span>
+                  <span>{t('markDone')}</span>
                 </button>
               )}
             </div>
@@ -541,10 +542,10 @@ export const BarberView = () => {
               <i className="bi bi-scissors fs-1" style={{ color: 'var(--accent-color)' }}></i>
             </div>
             <h5 className="text-white mb-2" style={{ fontSize: '1.25rem' }}>
-              No customer in chair. Ready when you are.
+              {t('noCustomerInChairState')}
             </h5>
             <p className="text-secondary small mb-4 mx-auto" style={{ maxWidth: '440px' }}>
-              Your chair is clean and ready. Tap below to call the next customer in your queue.
+              {t('chairVacantCalling')}
             </p>
 
             <button
@@ -559,7 +560,7 @@ export const BarberView = () => {
               }}
             >
               <i className="bi bi-megaphone-fill fs-5"></i>
-              <span>Call Next Customer ({upNextList.length} Waiting)</span>
+              <span>{t('callNextCustomer')} ({upNextList.length})</span>
             </button>
           </div>
         )}

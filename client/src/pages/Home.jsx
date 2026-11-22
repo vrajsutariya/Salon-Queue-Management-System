@@ -43,8 +43,11 @@ export const Home = () => {
   }, []);
 
   const waitingCount = liveStatus?.waitingCount ?? 0;
-  const estimatedWait = liveStatus?.estimatedWaitMinutes ?? 0;
+  const estimatedWait = liveStatus?.estimatedWaitMinutes;
+  const barbersUnavailable = liveStatus?.barbersUnavailable;
   const barbers = liveStatus?.activeBarbers || [];
+  const closingTimeDisplay = liveStatus?.closingTime || '9:00 PM';
+  const isOnlineOpen = liveStatus?.isQueueOpen !== false;
 
   return (
     <div className="container py-4" style={{ maxWidth: '1060px' }}>
@@ -67,7 +70,7 @@ export const Home = () => {
                 letterSpacing: '0.1em',
               }}
             >
-              Walk-in Lounge
+              {t('walkinLounge')}
             </span>
           </div>
           <h1
@@ -98,13 +101,15 @@ export const Home = () => {
             className="px-3 py-2 rounded-pill d-inline-flex align-items-center gap-2"
             style={{
               background: 'rgba(14, 14, 18, 0.75)',
-              border: `1px solid ${liveStatus?.isQueueOpen !== false ? 'rgba(46, 160, 67, 0.35)' : 'rgba(217, 119, 6, 0.4)'}`,
+              border: `1px solid ${isOnlineOpen ? 'rgba(46, 160, 67, 0.35)' : 'rgba(217, 119, 6, 0.4)'}`,
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
             }}
           >
-            <span className={`dot-indicator ${liveStatus?.isQueueOpen !== false ? 'dot-free' : 'dot-break'}`}></span>
+            <span className={`dot-indicator ${isOnlineOpen ? 'dot-free' : 'dot-break'}`}></span>
             <span className="fw-semibold small" style={{ color: 'var(--heading-color)' }}>
-              {liveStatus?.isQueueOpen !== false ? t('salonOpen') : 'Queue Closed'}
+              {isOnlineOpen
+                ? t('salonOpen', { time: closingTimeDisplay })
+                : t('onlineQueueClosed')}
             </span>
           </div>
         </div>
@@ -117,7 +122,7 @@ export const Home = () => {
             <span>{error}</span>
           </div>
           <button className="btn btn-sm btn-outline-dark" onClick={fetchStatus}>
-            Retry
+            {t('retry')}
           </button>
         </div>
       )}
@@ -154,7 +159,7 @@ export const Home = () => {
             className="small fw-semibold text-uppercase"
             style={{ color: 'var(--accent-color)', fontSize: '0.75rem', letterSpacing: '0.12em' }}
           >
-            Live Queue Status
+            {t('liveQueueStatus')}
           </span>
         </div>
 
@@ -177,12 +182,19 @@ export const Home = () => {
             {loading ? '...' : waitingCount}
           </motion.div>
 
-          <p
-            className="lead fw-medium mb-3"
-            style={{ color: 'var(--heading-color)', fontSize: '1.25rem' }}
-          >
-            {waitingCount === 1 ? `1 ${t('peopleWaiting')}` : `${waitingCount} ${t('peopleWaiting')}`}
-          </p>
+          {/* Friendly Empty State Badge when waitingCount === 0 */}
+          <div className="lead fw-medium mb-3" style={{ color: 'var(--heading-color)', fontSize: '1.25rem' }}>
+            {waitingCount === 0 ? (
+              <span className="badge badge-accent px-3 py-2 rounded-pill fs-6 fw-semibold shadow-sm d-inline-flex align-items-center gap-2">
+                <i className="bi bi-door-open-fill text-warning"></i>
+                <span>{t('emptyWaitingHome')}</span>
+              </span>
+            ) : waitingCount === 1 ? (
+              `1 ${t('personWaiting')}`
+            ) : (
+              `${waitingCount} ${t('peopleWaiting')}`
+            )}
+          </div>
 
           <div
             className="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill"
@@ -193,8 +205,12 @@ export const Home = () => {
           >
             <i className="bi bi-clock-history text-warning"></i>
             <span style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-              {waitingCount > 0
-                ? t('aboutWait').replace('{time}', estimatedWait)
+              {barbersUnavailable
+                ? t('barbersUnavailable')
+                : waitingCount > 0
+                ? estimatedWait !== null && estimatedWait !== undefined
+                  ? t('aboutWait', { time: estimatedWait })
+                  : t('estimatingWait')
                 : t('noWait')}
             </span>
           </div>
@@ -202,7 +218,7 @@ export const Home = () => {
 
         {/* Prominent Call to Action */}
         <div className="mt-4 pt-2 mx-auto" style={{ maxWidth: '480px' }}>
-          {liveStatus?.isQueueOpen !== false ? (
+          {isOnlineOpen ? (
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link
                 to="/join"
@@ -222,10 +238,10 @@ export const Home = () => {
                 style={{ borderRadius: '12px', opacity: 0.75, cursor: 'not-allowed' }}
               >
                 <i className="bi bi-door-closed text-warning"></i>
-                <span className="text-white">Online Queue Closed</span>
+                <span className="text-white">{t('onlineQueueClosed')}</span>
               </button>
               <p className="small mb-0 text-center" style={{ color: 'var(--amber-warning)' }}>
-                Online joining is closed for today. Walk-ins are still welcome at the salon.
+                {liveStatus?.autoCloseMessage || t('autoClosedNotice', { time: closingTimeDisplay })}
               </p>
             </div>
           )}
@@ -279,6 +295,7 @@ export const Home = () => {
                 <div key={barber._id} className={`barber-chip ${statusClass}`}>
                   <BarberAvatar
                     name={barber.name}
+                    photo={barber.photo}
                     size="sm"
                     status={barber.status}
                   />
@@ -316,7 +333,7 @@ export const Home = () => {
                 </h6>
               </div>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }} className="mb-3">
-                Lobby television display showing live tickets called to styling stations in real time.
+                {t('tvCardDesc')}
               </p>
             </div>
             <Link to="/display" className="btn btn-outline-gold w-100 py-2">
@@ -339,7 +356,7 @@ export const Home = () => {
                 </h6>
               </div>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }} className="mb-3">
-                Front desk coordination dashboard for walk-in registrations and chair assignments.
+                {t('receptionCardDesc')}
               </p>
             </div>
             <Link to="/reception" className="btn btn-outline-gold w-100 py-2">
@@ -362,7 +379,7 @@ export const Home = () => {
                 </h6>
               </div>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }} className="mb-3">
-                Styling chair console for barbers to manage customer callouts, in-chair timing, and service completion.
+                {t('barberCardDesc')}
               </p>
             </div>
             <Link to="/barber/Ravi" className="btn btn-outline-gold w-100 py-2">
