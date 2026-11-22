@@ -1,0 +1,23 @@
+{
+  "name": "salon-queue-management-system",
+  "version": "1.0.0",
+  "description": "Real-time, multi-device queue coordination platform for modern walk-in salons",
+  "scripts": {
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "build:client": "npm --prefix client run build",
+    "test": "node server/test_step7_verification.js"
+  },
+  "keywords": [
+    "salon-queue",
+    "real-time",
+    "socket.io",
+    "mern",
+    "react",
+    "express",
+    "mongodb"
+  ],
+  "author": "Vraj Sutariya",
+  "license": "ISC"
+}
