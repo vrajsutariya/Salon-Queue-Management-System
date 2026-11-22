@@ -39,9 +39,18 @@
   --status-noshow: #EF4444;
   --status-noshow-bg: rgba(239, 68, 68, 0.2);
 
+  /* Barber State Colors */
+  --barber-free: #10B981;
+  --barber-free-bg: rgba(16, 185, 129, 0.15);
+  --barber-busy: #EF4444;
+  --barber-busy-bg: rgba(239, 68, 68, 0.15);
+  --barber-break: #F59E0B;
+  --barber-break-bg: rgba(245, 158, 11, 0.15);
+
   /* Shadows */
   --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
   --shadow-gold: 0 0 15px var(--accent-gold-glow);
+  --shadow-gold-active: 0 0 20px rgba(212, 160, 23, 0.5);
 }
 
 /* Base Body Styles */
@@ -52,6 +61,34 @@ body {
   margin: 0;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Form inputs & controls with accessible 44px min-height */
+.form-control, .form-select {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  min-height: 46px;
+  border-radius: 8px;
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: var(--bg-input);
+  border-color: var(--border-focus);
+  color: var(--text-main);
+  box-shadow: 0 0 0 0.25rem var(--accent-gold-light);
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
+}
+
+/* Accessible tap targets for interactive buttons */
+.btn {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Card Styling */
@@ -73,6 +110,88 @@ body {
   padding: 1rem 1.25rem;
   font-weight: 600;
   color: var(--accent-gold);
+}
+
+/* Selectable Cards (Services & Barbers) */
+.selectable-card {
+  background-color: var(--bg-charcoal);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  min-height: 60px;
+  position: relative;
+}
+
+.selectable-card:hover:not(.disabled) {
+  border-color: var(--accent-gold);
+  background-color: var(--bg-card-hover);
+  transform: translateY(-2px);
+}
+
+.selectable-card.selected {
+  border-color: var(--accent-gold);
+  background-color: var(--accent-gold-light);
+  box-shadow: var(--shadow-gold);
+}
+
+.selectable-card.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+/* Barber Status Chips */
+.barber-chip {
+  background-color: var(--bg-charcoal);
+  border: 1px solid var(--border-color);
+  border-radius: 50px;
+  padding: 0.4rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.barber-avatar-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border-color);
+}
+
+.barber-chip-free {
+  border-color: var(--barber-free);
+}
+.barber-chip-busy {
+  border-color: var(--barber-busy);
+}
+.barber-chip-break {
+  border-color: var(--barber-break);
+}
+
+.dot-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-free {
+  background-color: var(--barber-free);
+  box-shadow: 0 0 6px var(--barber-free);
+}
+
+.dot-busy {
+  background-color: var(--barber-busy);
+  box-shadow: 0 0 6px var(--barber-busy);
+}
+
+.dot-break {
+  background-color: var(--barber-break);
+  box-shadow: 0 0 6px var(--barber-break);
 }
 
 /* Button & Accent Utilities */
@@ -147,6 +266,21 @@ body {
 }
 
 /* Animations */
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes pulse-called {
   0%, 100% {
     box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
@@ -154,6 +288,13 @@ body {
   50% {
     box-shadow: 0 0 12px 4px rgba(59, 130, 246, 0.6);
   }
+}
+
+/* Sticky Summary Card */
+.sticky-summary {
+  position: sticky;
+  top: 80px;
+  z-index: 10;
 }
 
 /* Reduced Motion Support */

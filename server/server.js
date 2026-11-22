@@ -4,6 +4,9 @@ import { Server } from 'socket.io';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import salonRoutes from './routes/salonRoutes.js';
+import queueRoutes from './routes/queueRoutes.js';
+import { seedDatabase } from './seeds/seedData.js';
 
 dotenv.config();
 
@@ -39,13 +42,27 @@ io.on('connection', (socket) => {
   });
 });
 
-// Attach socket.io to req for routes in subsequent steps
+// Attach socket.io to req for controllers/routes
 app.use((req, res, next) => {
   req.io = io;
   next();
 });
 
-// 3. Health Check Endpoint
+// 3. API Routes
+app.use('/api/salon', salonRoutes);
+app.use('/api/services', (req, res, next) => {
+  // redirect or forward to salon/services
+  req.url = '/services';
+  salonRoutes(req, res, next);
+});
+app.use('/api/barbers', (req, res, next) => {
+  // redirect or forward to salon/barbers
+  req.url = '/barbers';
+  salonRoutes(req, res, next);
+});
+app.use('/api/queue', queueRoutes);
+
+// Health Check Endpoint
 app.get('/api/health', (req, res) => {
   const mongoStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
   res.status(200).json({
@@ -63,6 +80,13 @@ app.get('/', (req, res) => {
   res.json({
     message: 'Crown & Blade Salon Queue Management System API is running.',
     healthCheck: '/api/health',
+    endpoints: [
+      '/api/salon/live-status',
+      '/api/services',
+      '/api/barbers',
+      '/api/queue/join',
+      '/api/queue/:id',
+    ],
   });
 });
 
@@ -71,14 +95,15 @@ const startServer = async () => {
   try {
     await mongoose.connect(MONGODB_URI);
     console.log('[MongoDB] Successfully connected to database');
+    await seedDatabase();
   } catch (err) {
-    console.warn('[MongoDB] Warning: MongoDB connection failed. Running in memory / offline DB mode.');
+    console.warn('[MongoDB] Warning: MongoDB connection failed. Running in offline/memory mode.');
     console.warn(`[MongoDB] Details: ${err.message}`);
   }
 
   server.listen(PORT, () => {
     console.log(`[Server] Crown & Blade Server listening on http://localhost:${PORT}`);
-    console.log(`[Server] Health check available at http://localhost:${PORT}/api/health`);
+    console.log(`[Server] Live status at http://localhost:${PORT}/api/salon/live-status`);
   });
 };
 
