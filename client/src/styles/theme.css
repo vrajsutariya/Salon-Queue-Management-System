@@ -1,0 +1,169 @@
+/* ==========================================================================
+   Crown & Blade Salon - Design Tokens & Theme Variables
+   Strict CSS Variables Only - Never hardcode colors in components
+   ========================================================================== */
+
+:root {
+  /* Surfaces & Backgrounds */
+  --bg-dark: #111827;
+  --bg-charcoal: #1F2937;
+  --bg-card: #2D3748;
+  --bg-card-hover: #374151;
+  --bg-input: #1A202C;
+  --bg-modal: #1F2937;
+
+  /* Accent Gold System */
+  --accent-gold: #D4A017;
+  --accent-gold-hover: #B8860B;
+  --accent-gold-light: rgba(212, 160, 23, 0.15);
+  --accent-gold-glow: rgba(212, 160, 23, 0.35);
+
+  /* Typography / Content */
+  --text-main: #F9FAFB;
+  --text-muted: #9CA3AF;
+  --text-dark: #111827;
+
+  /* Borders & Dividers */
+  --border-color: #374151;
+  --border-focus: #D4A017;
+
+  /* Queue Status Colors */
+  --status-waiting: #F59E0B;
+  --status-waiting-bg: rgba(245, 158, 11, 0.15);
+  --status-called: #3B82F6;
+  --status-called-bg: rgba(59, 130, 246, 0.2);
+  --status-in-chair: #10B981;
+  --status-in-chair-bg: rgba(16, 185, 129, 0.2);
+  --status-done: #6B7280;
+  --status-done-bg: rgba(107, 114, 128, 0.2);
+  --status-noshow: #EF4444;
+  --status-noshow-bg: rgba(239, 68, 68, 0.2);
+
+  /* Shadows */
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --shadow-gold: 0 0 15px var(--accent-gold-glow);
+}
+
+/* Base Body Styles */
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Card Styling */
+.salon-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-main);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.salon-card:hover {
+  border-color: var(--accent-gold);
+}
+
+.salon-card-header {
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+  color: var(--accent-gold);
+}
+
+/* Button & Accent Utilities */
+.btn-gold {
+  background-color: var(--accent-gold);
+  border: 1px solid var(--accent-gold);
+  color: var(--text-dark);
+  font-weight: 600;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-gold:hover, .btn-gold:focus {
+  background-color: var(--accent-gold-hover);
+  border-color: var(--accent-gold-hover);
+  color: #000000;
+  box-shadow: var(--shadow-gold);
+}
+
+.btn-outline-gold {
+  background-color: transparent;
+  border: 1px solid var(--accent-gold);
+  color: var(--accent-gold);
+  font-weight: 600;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-gold:hover, .btn-outline-gold:focus {
+  background-color: var(--accent-gold);
+  color: var(--text-dark);
+}
+
+/* Badges */
+.badge-gold {
+  background-color: var(--accent-gold-light);
+  color: var(--accent-gold);
+  border: 1px solid var(--accent-gold);
+}
+
+.badge-status-waiting {
+  background-color: var(--status-waiting-bg);
+  color: var(--status-waiting);
+  border: 1px solid var(--status-waiting);
+}
+
+.badge-status-called {
+  background-color: var(--status-called-bg);
+  color: var(--status-called);
+  border: 1px solid var(--status-called);
+  animation: pulse-called 2s infinite ease-in-out;
+}
+
+.badge-status-in-chair {
+  background-color: var(--status-in-chair-bg);
+  color: var(--status-in-chair);
+  border: 1px solid var(--status-in-chair);
+}
+
+.badge-status-done {
+  background-color: var(--status-done-bg);
+  color: var(--status-done);
+  border: 1px solid var(--status-done);
+}
+
+.badge-status-noshow {
+  background-color: var(--status-noshow-bg);
+  color: var(--status-noshow);
+  border: 1px solid var(--status-noshow);
+}
+
+/* Animations */
+@keyframes pulse-called {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 12px 4px rgba(59, 130, 246, 0.6);
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
