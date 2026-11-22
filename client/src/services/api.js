@@ -41,4 +41,105 @@ export const api = {
     if (!res.ok) throw new Error('Failed to fetch ticket status');
     return res.json();
   },
+
+  async cancelTicket(ticketId) {
+    const res = await fetch(`${API_BASE_URL}/api/queue/${ticketId}/cancel`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
+
+  async updateTicketStatus(ticketId, status, barberName = null) {
+    const res = await fetch(`${API_BASE_URL}/api/queue/${ticketId}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status, barberName }),
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
+
+  async getQueue(status = '') {
+    const query = status ? `?status=${status}` : '';
+    const res = await fetch(`${API_BASE_URL}/api/queue${query}`);
+    if (!res.ok) throw new Error('Failed to fetch queue list');
+    return res.json();
+  },
+
+  async callNext(barberId) {
+    const res = await fetch(`${API_BASE_URL}/api/queue/call-next`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ barberId }),
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
+
+  async addWalkin(payload) {
+    const res = await fetch(`${API_BASE_URL}/api/queue/walkin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
+
+  async markNoShow(ticketId) {
+    const res = await fetch(`${API_BASE_URL}/api/queue/${ticketId}/no-show`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
+
+  async updateBarberStatus(barberId, status, isOnDuty) {
+    const res = await fetch(`${API_BASE_URL}/api/barbers/${barberId}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status, isOnDuty }),
+    });
+    const data = await res.json();
+    return {
+      status: res.status,
+      ok: res.ok,
+      data,
+    };
+  },
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { api } from '../services/api';
 
@@ -60,10 +61,7 @@ export const JoinQueue = () => {
     if (selectedServices.includes(serviceId)) {
       setSelectedServices((prev) => prev.filter((id) => id !== serviceId));
     } else {
-      if (selectedServices.length >= 3) {
-        // Block 4th selection
-        return;
-      }
+      if (selectedServices.length >= 3) return;
       setSelectedServices((prev) => [...prev, serviceId]);
     }
   };
@@ -73,8 +71,6 @@ export const JoinQueue = () => {
     const selectedObjects = servicesList.filter((s) => selectedServices.includes(s._id));
     const totalMinutes = selectedObjects.reduce((acc, curr) => acc + (curr.durationMinutes || 0), 0);
     const totalPrice = selectedObjects.reduce((acc, curr) => acc + (curr.priceInr || 0), 0);
-
-    // Dynamic wait estimate: current salon queue wait + this service
     const baseWait = liveStatus?.estimatedWaitMinutes || 0;
     const expectedWait = baseWait;
 
@@ -112,11 +108,9 @@ export const JoinQueue = () => {
 
       if (response.ok && response.data.success) {
         const ticketId = response.data.ticket._id;
-        // Store in localStorage for status persistence
         localStorage.setItem('salon_active_ticket', ticketId);
         navigate(`/status/${ticketId}`);
       } else if (response.status === 409 && response.data.alreadyActive) {
-        // Existing ticket found
         setActiveAlert(t('alreadyActiveAlert'));
         const existingTicketId = response.data.ticket._id;
         localStorage.setItem('salon_active_ticket', existingTicketId);
@@ -135,43 +129,59 @@ export const JoinQueue = () => {
   };
 
   return (
-    <div className="container py-4 animate-fade-in-up">
-      <div className="mb-4">
-        <Link to="/" className="btn btn-sm btn-outline-gold mb-2">
+    <div className="container py-4 py-md-5" style={{ maxWidth: '1060px' }}>
+      {/* Top Breadcrumb & Heading with Breathing Room */}
+      <motion.div
+        className="mb-4 mb-md-5"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <Link to="/" className="btn btn-sm btn-outline-gold mb-3 px-3 py-1 rounded-pill">
           <i className="bi bi-arrow-left me-1"></i> {t('backHome')}
         </Link>
-        <h2 className="fw-bold mb-1" style={{ color: 'var(--text-main)' }}>
+        <h1 className="salon-heading mb-1" style={{ fontSize: '2.4rem' }}>
           {t('joinTitle')}
-        </h2>
-        <p className="text-muted mb-0">{t('joinSubtitle')}</p>
-      </div>
+        </h1>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', maxWidth: '640px' }} className="mb-0">
+          {t('joinSubtitle')}
+        </p>
+      </motion.div>
 
       {activeAlert && (
-        <div className="alert alert-info d-flex align-items-center mb-4" role="alert">
+        <div className="alert alert-info d-flex align-items-center mb-4 rounded-3" role="alert">
           <div className="spinner-border spinner-border-sm me-3" role="status"></div>
           <div>{activeAlert}</div>
         </div>
       )}
 
       {errorMessage && (
-        <div className="alert alert-danger d-flex align-items-center mb-4" role="alert">
+        <div className="alert alert-danger d-flex align-items-center mb-4 rounded-3" role="alert">
           <i className="bi bi-exclamation-octagon-fill me-2 fs-5"></i>
           <div>{errorMessage}</div>
         </div>
       )}
 
       <form onSubmit={handleSubmit}>
-        <div className="row g-4">
+        <div className="row g-4 g-lg-5">
           {/* Main Form Left Column */}
           <div className="col-lg-8">
             {/* 1. Customer Details */}
-            <div className="salon-card p-4 mb-4">
-              <h5 className="fw-bold mb-3" style={{ color: 'var(--accent-gold)' }}>
-                <i className="bi bi-person-circle me-2"></i>1. Customer Information
-              </h5>
+            <motion.div
+              className="salon-card p-4 p-md-5 mb-4"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45 }}
+            >
+              <div className="d-flex align-items-center gap-2 mb-3">
+                <i className="bi bi-person-circle fs-5" style={{ color: 'var(--accent-color)' }}></i>
+                <h5 className="salon-heading mb-0" style={{ fontSize: '1.25rem' }}>
+                  1. Customer Details
+                </h5>
+              </div>
 
-              <div className="mb-3">
-                <label className="form-label text-white fw-semibold" htmlFor="customerName">
+              <div className="mb-4">
+                <label className="form-label text-white fw-semibold small" htmlFor="customerName">
                   {t('fullName')} <span className="text-danger">*</span>
                 </label>
                 <input
@@ -192,11 +202,11 @@ export const JoinQueue = () => {
               </div>
 
               <div>
-                <label className="form-label text-white fw-semibold" htmlFor="phone">
+                <label className="form-label text-white fw-semibold small" htmlFor="phone">
                   {t('phone')} <span className="text-danger">*</span>
                 </label>
                 <div className="input-group">
-                  <span className="input-group-text bg-dark border-secondary text-muted">+91</span>
+                  <span className="input-group-text bg-dark border-secondary text-secondary">+91</span>
                   <input
                     id="phone"
                     type="tel"
@@ -214,9 +224,9 @@ export const JoinQueue = () => {
                     required
                   />
                 </div>
-                <div className="d-flex justify-content-between mt-1">
-                  <small className="text-muted">{t('phoneHelp')}</small>
-                  <small className={cleanPhone.length === 10 ? 'text-success' : 'text-muted'}>
+                <div className="d-flex justify-content-between mt-2">
+                  <small style={{ color: 'var(--text-secondary)' }}>{t('phoneHelp')}</small>
+                  <small className={cleanPhone.length === 10 ? 'text-success fw-semibold' : 'text-muted'}>
                     {cleanPhone.length}/10 digits
                   </small>
                 </div>
@@ -224,22 +234,32 @@ export const JoinQueue = () => {
                   <div className="text-danger small mt-1">{t('phoneValidation')}</div>
                 )}
               </div>
-            </div>
+            </motion.div>
 
             {/* 2. Service Selection Cards */}
-            <div className="salon-card p-4 mb-4">
+            <motion.div
+              className="salon-card p-4 p-md-5 mb-4"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.1 }}
+            >
               <div className="d-flex flex-wrap align-items-center justify-content-between mb-2">
-                <h5 className="fw-bold mb-0" style={{ color: 'var(--accent-gold)' }}>
-                  <i className="bi bi-card-checklist me-2"></i>2. {t('servicesTitle')}
-                </h5>
-                <span className="badge badge-gold">
+                <div className="d-flex align-items-center gap-2">
+                  <i className="bi bi-card-checklist fs-5" style={{ color: 'var(--accent-color)' }}></i>
+                  <h5 className="salon-heading mb-0" style={{ fontSize: '1.25rem' }}>
+                    2. {t('servicesTitle')}
+                  </h5>
+                </div>
+                <span className="badge badge-accent px-3 py-1 rounded-pill">
                   {selectedServices.length}/3 Selected
                 </span>
               </div>
-              <p className="text-muted small mb-3">{t('servicesSub')}</p>
+              <p style={{ color: 'var(--text-secondary)' }} className="small mb-4">
+                {t('servicesSub')}
+              </p>
 
               {selectedServices.length >= 3 && (
-                <div className="alert alert-warning py-2 px-3 small d-flex align-items-center mb-3">
+                <div className="alert alert-warning py-2 px-3 small d-flex align-items-center mb-3 rounded-3">
                   <i className="bi bi-info-circle-fill me-2 text-warning"></i>
                   {t('maxServicesReached')}
                 </div>
@@ -255,8 +275,7 @@ export const JoinQueue = () => {
                   {servicesList.map((service) => {
                     const isSelected = selectedServices.includes(service._id);
                     const isDisabled = !isSelected && selectedServices.length >= 3;
-                    const serviceName =
-                      service.name?.[lang] || service.name?.en || service.name;
+                    const serviceName = service.name?.[lang] || service.name?.en || service.name;
 
                     return (
                       <div key={service._id} className="col-12 col-md-6">
@@ -277,14 +296,16 @@ export const JoinQueue = () => {
                           }}
                         >
                           <div>
-                            <div className="fw-bold text-white mb-1">{serviceName}</div>
-                            <div className="small text-muted d-flex align-items-center gap-2">
+                            <div className="fw-semibold text-white mb-1" style={{ fontSize: '0.98rem' }}>
+                              {serviceName}
+                            </div>
+                            <div className="small d-flex align-items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
                               <span>
                                 <i className="bi bi-clock me-1 text-warning"></i>
                                 {service.durationMinutes} {t('minutes')}
                               </span>
                               <span>•</span>
-                              <span className="fw-semibold" style={{ color: 'var(--accent-gold)' }}>
+                              <span className="fw-semibold" style={{ color: 'var(--accent-color)' }}>
                                 ₹{service.priceInr}
                               </span>
                             </div>
@@ -292,9 +313,9 @@ export const JoinQueue = () => {
 
                           <div className="ms-2">
                             {isSelected ? (
-                              <i className="bi bi-check-circle-fill fs-4" style={{ color: 'var(--accent-gold)' }}></i>
+                              <i className="bi bi-check-circle-fill fs-4" style={{ color: 'var(--accent-color)' }}></i>
                             ) : (
-                              <i className="bi bi-circle fs-4 text-muted"></i>
+                              <i className="bi bi-circle fs-4 text-secondary opacity-50"></i>
                             )}
                           </div>
                         </div>
@@ -303,20 +324,30 @@ export const JoinQueue = () => {
                   })}
                 </div>
               )}
-            </div>
+            </motion.div>
 
-            {/* 3. Barber Picker */}
-            <div className="salon-card p-4 mb-4">
-              <h5 className="fw-bold mb-1" style={{ color: 'var(--accent-gold)' }}>
-                <i className="bi bi-scissors me-2"></i>3. {t('barberTitle')}
-              </h5>
-              <p className="text-muted small mb-3">{t('barberSub')}</p>
+            {/* 3. Barber Preference (Fully Working & Verified) */}
+            <motion.div
+              className="salon-card p-4 p-md-5 mb-4"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.2 }}
+            >
+              <div className="d-flex align-items-center gap-2 mb-2">
+                <i className="bi bi-scissors fs-5" style={{ color: 'var(--accent-color)' }}></i>
+                <h5 className="salon-heading mb-0" style={{ fontSize: '1.25rem' }}>
+                  3. {t('barberTitle')}
+                </h5>
+              </div>
+              <p style={{ color: 'var(--text-secondary)' }} className="small mb-4">
+                {t('barberSub')}
+              </p>
 
               <div className="row g-3">
                 {/* Option 1: Any Barber (Fastest) */}
                 <div className="col-12 col-md-6">
                   <div
-                    className={`selectable-card d-flex align-items-center gap-3 ${
+                    className={`selectable-card d-flex align-items-center justify-content-between ${
                       preferredBarber === 'any' ? 'selected' : ''
                     }`}
                     onClick={() => setPreferredBarber('any')}
@@ -327,32 +358,42 @@ export const JoinQueue = () => {
                       if (e.key === ' ' || e.key === 'Enter') setPreferredBarber('any');
                     }}
                   >
-                    <div
-                      className="rounded-circle d-flex align-items-center justify-content-center"
-                      style={{
-                        width: '42px',
-                        height: '42px',
-                        backgroundColor: 'var(--accent-gold-light)',
-                        color: 'var(--accent-gold)',
-                        border: '1px solid var(--accent-gold)',
-                      }}
-                    >
-                      <i className="bi bi-lightning-charge-fill fs-5"></i>
+                    <div className="d-flex align-items-center gap-3">
+                      <div
+                        className="rounded-circle d-flex align-items-center justify-content-center"
+                        style={{
+                          width: '44px',
+                          height: '44px',
+                          backgroundColor: 'rgba(229, 195, 120, 0.15)',
+                          color: 'var(--accent-color)',
+                          border: '1px solid var(--accent-color)',
+                        }}
+                      >
+                        <i className="bi bi-lightning-charge-fill fs-5"></i>
+                      </div>
+                      <div>
+                        <div className="fw-semibold text-white">{t('fastestAvailable')}</div>
+                        <small style={{ color: 'var(--text-secondary)' }}>First available chair</small>
+                      </div>
                     </div>
+
                     <div>
-                      <div className="fw-bold text-white">{t('fastestAvailable')}</div>
-                      <small className="text-muted">First available chair</small>
+                      {preferredBarber === 'any' ? (
+                        <i className="bi bi-check-circle-fill fs-4" style={{ color: 'var(--accent-color)' }}></i>
+                      ) : (
+                        <i className="bi bi-circle fs-4 text-secondary opacity-50"></i>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* Option 2: Individual Barbers */}
                 {barbersList.map((barber) => {
-                  const isSelected = preferredBarber === barber._id || preferredBarber === barber.name;
+                  const isSelected = preferredBarber === barber.name || preferredBarber === barber._id;
                   return (
                     <div key={barber._id} className="col-12 col-md-6">
                       <div
-                        className={`selectable-card d-flex align-items-center gap-3 ${
+                        className={`selectable-card d-flex align-items-center justify-content-between ${
                           isSelected ? 'selected' : ''
                         }`}
                         onClick={() => setPreferredBarber(barber.name)}
@@ -363,47 +404,69 @@ export const JoinQueue = () => {
                           if (e.key === ' ' || e.key === 'Enter') setPreferredBarber(barber.name);
                         }}
                       >
-                        <img
-                          src={barber.photo || 'https://via.placeholder.com/42'}
-                          alt={barber.name}
-                          className="rounded-circle border"
-                          style={{
-                            width: '42px',
-                            height: '42px',
-                            objectFit: 'cover',
-                            borderColor: 'var(--border-color)',
-                          }}
-                        />
+                        <div className="d-flex align-items-center gap-3">
+                          <img
+                            src={barber.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
+                            alt={barber.name}
+                            className="rounded-circle border"
+                            style={{
+                              width: '44px',
+                              height: '44px',
+                              objectFit: 'cover',
+                              borderColor: 'var(--border-color)',
+                            }}
+                          />
+                          <div>
+                            <div className="fw-semibold text-white">{barber.name}</div>
+                            <small className="text-capitalize" style={{ color: 'var(--text-secondary)' }}>
+                              Status: {barber.status}
+                            </small>
+                          </div>
+                        </div>
+
                         <div>
-                          <div className="fw-bold text-white">{barber.name}</div>
-                          <small className="text-muted text-capitalize">
-                            Status: {barber.status}
-                          </small>
+                          {isSelected ? (
+                            <i className="bi bi-check-circle-fill fs-4" style={{ color: 'var(--accent-color)' }}></i>
+                          ) : (
+                            <i className="bi bi-circle fs-4 text-secondary opacity-50"></i>
+                          )}
                         </div>
                       </div>
                     </div>
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Sticky Summary Bar / Card Right Column */}
           <div className="col-lg-4">
-            <div className="salon-card p-4 sticky-summary">
-              <h5 className="fw-bold mb-3 border-bottom pb-2" style={{ color: 'var(--accent-gold)', borderColor: 'var(--border-color)' }}>
-                <i className="bi bi-receipt me-2"></i>{t('summaryTitle')}
-              </h5>
+            <motion.div
+              className="salon-card p-4 sticky-summary"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.15 }}
+            >
+              <div className="d-flex align-items-center gap-2 mb-3 border-bottom pb-3" style={{ borderColor: 'var(--border-color)' }}>
+                <i className="bi bi-receipt fs-5" style={{ color: 'var(--accent-color)' }}></i>
+                <h5 className="salon-heading mb-0" style={{ fontSize: '1.25rem' }}>
+                  {t('summaryTitle')}
+                </h5>
+              </div>
 
               {/* Selected Services Breakdown */}
               <div className="mb-3">
-                <span className="small text-muted d-block mb-2">{t('selectedServicesCount')} ({summary.count}/3):</span>
+                <span className="small d-block mb-2 fw-medium" style={{ color: 'var(--text-secondary)' }}>
+                  {t('selectedServicesCount')} ({summary.count}/3):
+                </span>
                 {summary.selectedObjects.length > 0 ? (
                   <ul className="list-unstyled mb-0">
                     {summary.selectedObjects.map((s) => (
-                      <li key={s._id} className="d-flex justify-content-between small text-white py-1 border-bottom" style={{ borderColor: 'var(--border-color)' }}>
+                      <li key={s._id} className="d-flex justify-content-between small text-white py-2 border-bottom" style={{ borderColor: 'var(--border-color)' }}>
                         <span>{s.name?.[lang] || s.name?.en || s.name}</span>
-                        <span style={{ color: 'var(--accent-gold)' }}>₹{s.priceInr}</span>
+                        <span style={{ color: 'var(--accent-color)' }} className="fw-semibold">
+                          ₹{s.priceInr}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -414,28 +477,36 @@ export const JoinQueue = () => {
                 )}
               </div>
 
+              {/* Preferred Stylist Highlight */}
+              <div className="d-flex justify-content-between align-items-center p-2 mb-3 rounded-3" style={{ background: 'rgba(229, 195, 120, 0.08)', border: '1px solid rgba(229, 195, 120, 0.2)' }}>
+                <span className="small text-secondary fw-medium">Stylist:</span>
+                <span className="badge badge-accent px-2 py-1">
+                  {preferredBarber === 'any' ? t('fastestAvailable') : `Barber ${preferredBarber}`}
+                </span>
+              </div>
+
               {/* Metrics */}
-              <div className="p-3 rounded mb-3" style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-color)' }}>
+              <div className="p-3 rounded-3 mb-4" style={{ backgroundColor: 'rgba(8, 8, 10, 0.75)', border: '1px solid var(--border-color)' }}>
                 <div className="d-flex justify-content-between mb-2">
-                  <span className="text-muted small">{t('totalDuration')}:</span>
+                  <span className="small" style={{ color: 'var(--text-secondary)' }}>{t('totalDuration')}:</span>
                   <span className="fw-bold text-white">{summary.totalMinutes} {t('minutes')}</span>
                 </div>
                 <div className="d-flex justify-content-between mb-2">
-                  <span className="text-muted small">{t('expectedWait')}:</span>
+                  <span className="small" style={{ color: 'var(--text-secondary)' }}>{t('expectedWait')}:</span>
                   <span className="fw-bold" style={{ color: 'var(--status-waiting)' }}>
                     ~{summary.expectedWait} {t('minutes')}
                   </span>
                 </div>
                 <div className="d-flex justify-content-between pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
                   <span className="fw-bold text-white">{t('totalPrice')}:</span>
-                  <span className="fw-bold fs-5" style={{ color: 'var(--accent-gold)' }}>₹{summary.totalPrice}</span>
+                  <span className="fw-bold fs-5" style={{ color: 'var(--accent-color)' }}>₹{summary.totalPrice}</span>
                 </div>
               </div>
 
               {/* Confirm & Join Button */}
               <button
                 type="submit"
-                className="btn btn-gold w-100 py-3 fw-bold text-uppercase shadow"
+                className="btn btn-gold w-100 py-3 fw-bold text-uppercase shadow-lg"
                 disabled={!isFormValid || submitting}
               >
                 {submitting ? (
@@ -445,16 +516,16 @@ export const JoinQueue = () => {
                   </>
                 ) : (
                   <>
-                    <i className="bi bi-check-lg me-2 fs-5"></i>
+                    <i className="bi bi-check2-circle me-2 fs-5"></i>
                     {t('confirmAndJoin')}
                   </>
                 )}
               </button>
 
-              <small className="text-muted text-center d-block mt-3" style={{ fontSize: '0.75rem' }}>
-                Offline payment in cash/UPI upon completion at the salon desk.
+              <small className="text-center d-block mt-3" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                Walk-ins pay offline at the desk upon service completion.
               </small>
-            </div>
+            </motion.div>
           </div>
         </div>
       </form>

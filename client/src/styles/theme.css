@@ -1,140 +1,353 @@
 /* ==========================================================================
-   Crown & Blade Salon - Design Tokens & Theme Variables
-   Strict CSS Variables Only - Never hardcode colors in components
+   Crown & Blade Salon - Atelier Luxury Design System
+   Senior Frontend Redesign: Noir, Warm Champagne Gold, & Frosted Glass
    ========================================================================== */
 
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..800;1,9..144,300..800&family=Jost:ital,wght@0,300..700;1,300..700&display=swap');
+
 :root {
-  /* Surfaces & Backgrounds */
-  --bg-dark: #111827;
-  --bg-charcoal: #1F2937;
-  --bg-card: #2D3748;
-  --bg-card-hover: #374151;
-  --bg-input: #1A202C;
-  --bg-modal: #1F2937;
+  /* 1. Deep Noir Atmospheric Backgrounds */
+  --bg-deep: #08080A;
+  --bg-color: #08080A;
+  --bg-surface: #0E0E12;
+  --bg-card: #131318;
+  --bg-card-hover: #191920;
+  --bg-input: #0B0B0E;
+  --bg-glass-nav: rgba(14, 14, 18, 0.88);
+  --bg-glass-card: rgba(19, 19, 24, 0.88);
 
-  /* Accent Gold System */
-  --accent-gold: #D4A017;
-  --accent-gold-hover: #B8860B;
-  --accent-gold-light: rgba(212, 160, 23, 0.15);
-  --accent-gold-glow: rgba(212, 160, 23, 0.35);
+  /* Backwards-compatibility aliases */
+  --bg-dark: var(--bg-deep);
+  --bg-base: var(--bg-deep);
+  --bg-charcoal: var(--bg-card);
+  --card-color: var(--bg-card);
 
-  /* Typography / Content */
-  --text-main: #F9FAFB;
-  --text-muted: #9CA3AF;
-  --text-dark: #111827;
+  /* 2. Metallic Warm Champagne Gold System */
+  --accent-color: #E5C378;
+  --gold-primary: #E5C378;
+  --gold-light: #F4E8CE;
+  --gold-deep: #A37E3E;
+  --dark-accent-color: #A37E3E;
+  --accent-gold: #E5C378;
+  --accent-gold-hover: #F8F6F0;
 
-  /* Borders & Dividers */
-  --border-color: #374151;
-  --border-focus: #D4A017;
+  --gold-gradient: linear-gradient(135deg, #FBF9F5 0%, #E5C378 50%, #B58F49 100%);
+  --gold-gradient-hover: linear-gradient(135deg, #FFFFFF 0%, #F5DEB3 50%, #C9A45B 100%);
+  --gold-gradient-subtle: linear-gradient(135deg, rgba(229, 195, 120, 0.15) 0%, rgba(163, 126, 62, 0.08) 100%);
+  --gold-border-gradient: linear-gradient(90deg, rgba(229, 195, 120, 0.05), rgba(229, 195, 120, 0.35), rgba(229, 195, 120, 0.05));
 
-  /* Queue Status Colors */
-  --status-waiting: #F59E0B;
-  --status-waiting-bg: rgba(245, 158, 11, 0.15);
-  --status-called: #3B82F6;
-  --status-called-bg: rgba(59, 130, 246, 0.2);
-  --status-in-chair: #10B981;
-  --status-in-chair-bg: rgba(16, 185, 129, 0.2);
-  --status-done: #6B7280;
-  --status-done-bg: rgba(107, 114, 128, 0.2);
-  --status-noshow: #EF4444;
-  --status-noshow-bg: rgba(239, 68, 68, 0.2);
+  --gold-glow: 0 0 24px rgba(229, 195, 120, 0.25);
+  --gold-glow-subtle: 0 0 16px rgba(229, 195, 120, 0.14);
+  --shadow-gold: var(--gold-glow);
 
-  /* Barber State Colors */
-  --barber-free: #10B981;
-  --barber-free-bg: rgba(16, 185, 129, 0.15);
-  --barber-busy: #EF4444;
-  --barber-busy-bg: rgba(239, 68, 68, 0.15);
-  --barber-break: #F59E0B;
-  --barber-break-bg: rgba(245, 158, 11, 0.15);
+  /* 3. High-Contrast Accessible Typography */
+  --heading-color: #F8F7F4;       /* Radiant warm ivory for prominent titles */
+  --text-primary: #F8F7F4;        /* Primary content */
+  --text-secondary: #C8C5BD;      /* Soft silver-linen for readable paragraphs */
+  --text-muted: #969288;          /* Clear secondary captions */
+  --text-color: #C8C5BD;          /* Standard body copy */
+  --text-main: #F8F7F4;
+  --text-gold: #E5C378;
+  --text-dark: #08080A;
+
+  /* 4. Borders & Accents */
+  --border-color: rgba(229, 195, 120, 0.16);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(229, 195, 120, 0.38);
+
+  /* 5. Semantic Indicators */
+  --color-success: #2EA043;
+  --color-warning: #D97706;
+  --color-danger: #F85149;
+  --color-info: #38BDF8;
+
+  --amber-warning: #D97706;
+
+  /* Status Tokens */
+  --status-waiting: #D97706;
+  --status-waiting-bg: rgba(217, 119, 6, 0.16);
+  --status-called: #38BDF8;
+  --status-called-bg: rgba(56, 189, 248, 0.18);
+  --status-in-chair: #2EA043;
+  --status-in-chair-bg: rgba(46, 160, 67, 0.18);
+  --status-done: #9CA3AF;
+  --status-done-bg: rgba(156, 163, 175, 0.16);
+  --status-noshow: #F85149;
+  --status-noshow-bg: rgba(248, 81, 73, 0.18);
+  --status-cancelled: #9CA3AF;
+  --status-cancelled-bg: rgba(156, 163, 175, 0.14);
+
+  /* Barber State Tokens */
+  --barber-free: #2EA043;
+  --barber-busy: #F85149;
+  --barber-break: #D97706;
 
   /* Shadows */
-  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
-  --shadow-gold: 0 0 15px var(--accent-gold-glow);
-  --shadow-gold-active: 0 0 20px rgba(212, 160, 23, 0.5);
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.7);
+  --shadow-card-elevated: 0 16px 40px rgba(0, 0, 0, 0.85);
 }
 
 /* Base Body Styles */
 body {
-  background-color: var(--bg-dark);
-  color: var(--text-main);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--bg-deep);
+  background: radial-gradient(circle at 50% -20%, rgba(229, 195, 120, 0.09) 0%, rgba(8, 8, 10, 0.98) 50%, rgba(8, 8, 10, 1) 100%), #08080A;
+  background-attachment: fixed;
+  color: var(--text-secondary);
+  font-family: 'Jost', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  text-rendering: geometricPrecision;
   margin: 0;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Form inputs & controls with accessible 44px min-height */
+/* Headings: Editorial Fraunces Serif */
+h1, h2, h3, h4, h5, h6,
+.salon-heading {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 500;
+  color: var(--heading-color);
+  letter-spacing: -0.015em;
+  margin-bottom: 0.5rem;
+}
+
+p, .lead, small, span, div {
+  color: inherit;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+.text-secondary {
+  color: var(--text-secondary) !important;
+}
+
+::selection {
+  background: var(--accent-color);
+  color: var(--bg-deep);
+}
+
+/* ==========================================================================
+   Floating Header (Compact, Snug, No Awkward Dead Space)
+   ========================================================================== */
+
+.floating-nav-wrapper {
+  position: sticky;
+  top: 14px;
+  z-index: 1040;
+  width: 100%;
+  padding: 0 1rem;
+  pointer-events: none;
+}
+
+.floating-nav-island {
+  max-width: 860px;
+  width: 100%;
+  margin: 0 auto;
+  pointer-events: auto;
+  background: var(--bg-glass-nav);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: 50px;
+  padding: 0.42rem 0.85rem 0.42rem 1rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.floating-nav-island:hover {
+  border-color: rgba(229, 195, 120, 0.32);
+}
+
+/* Floating Navigation Links */
+.floating-nav-link {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 0.38rem 0.85rem;
+  border-radius: 50px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.floating-nav-link:hover {
+  color: var(--heading-color);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.floating-nav-link.active {
+  color: var(--accent-color) !important;
+  background: var(--gold-gradient-subtle);
+  border: 1px solid rgba(229, 195, 120, 0.28);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================================================
+   Luxury Cards & Glassmorphism
+   ========================================================================== */
+
+.salon-card {
+  background-color: var(--bg-card);
+  background: linear-gradient(180deg, rgba(23, 23, 29, 0.94) 0%, rgba(15, 15, 20, 0.98) 100%);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.salon-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--gold-border-gradient);
+  pointer-events: none;
+}
+
+.salon-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(229, 195, 120, 0.12);
+  transform: translateY(-2px);
+}
+
+.salon-card-header {
+  border-bottom: 1px solid rgba(229, 195, 120, 0.14);
+  padding: 1.15rem 1.4rem;
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  color: var(--heading-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Form Controls */
 .form-control, .form-select {
   background-color: var(--bg-input);
-  border: 1px solid var(--border-color);
-  color: var(--text-main);
-  min-height: 46px;
-  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  color: var(--heading-color);
+  font-family: 'Jost', sans-serif;
+  min-height: 48px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
 }
 
 .form-control:focus, .form-select:focus {
   background-color: var(--bg-input);
-  border-color: var(--border-focus);
-  color: var(--text-main);
-  box-shadow: 0 0 0 0.25rem var(--accent-gold-light);
+  border-color: var(--accent-color);
+  color: var(--heading-color);
+  box-shadow: 0 0 0 0.25rem rgba(229, 195, 120, 0.2);
 }
 
 .form-control::placeholder {
   color: var(--text-muted);
 }
 
-/* Accessible tap targets for interactive buttons */
+/* Buttons */
 .btn {
-  min-height: 44px;
+  font-family: 'Jost', sans-serif;
+  min-height: 42px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-/* Card Styling */
-.salon-card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  color: var(--text-main);
-  box-shadow: var(--shadow-card);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
-.salon-card:hover {
-  border-color: var(--accent-gold);
-}
-
-.salon-card-header {
-  border-bottom: 1px solid var(--border-color);
-  padding: 1rem 1.25rem;
   font-weight: 600;
-  color: var(--accent-gold);
+  border-radius: 10px;
+  letter-spacing: 0.02em;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
-/* Selectable Cards (Services & Barbers) */
-.selectable-card {
-  background-color: var(--bg-charcoal);
+.btn:active {
+  transform: scale(0.98) !important;
+}
+
+.btn-gold, .btn-accent {
+  background: var(--gold-gradient);
+  border: 1px solid var(--accent-color);
+  color: #0A0A0A !important;
+  font-weight: 600;
+  padding: 0.6rem 1.4rem;
+  box-shadow: 0 4px 14px rgba(229, 195, 120, 0.22);
+}
+
+.btn-gold:hover, .btn-gold:focus,
+.btn-accent:hover, .btn-accent:focus {
+  background: var(--gold-gradient-hover);
+  color: #000000 !important;
+  transform: translateY(-2px);
+  box-shadow: var(--gold-glow);
+}
+
+.btn-outline-gold, .btn-outline-accent {
+  background-color: transparent;
   border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 1rem;
+  color: var(--accent-color);
+  font-weight: 500;
+  padding: 0.55rem 1.3rem;
+}
+
+.btn-outline-gold:hover, .btn-outline-gold:focus,
+.btn-outline-accent:hover, .btn-outline-accent:focus {
+  background: rgba(229, 195, 120, 0.12);
+  border-color: var(--accent-color);
+  color: var(--heading-color);
+  transform: translateY(-1px);
+  box-shadow: var(--gold-glow-subtle);
+}
+
+.btn-ghost-danger {
+  background-color: transparent;
+  border: 1px solid rgba(248, 81, 73, 0.25);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  padding: 0.45rem 1rem;
+}
+
+.btn-ghost-danger:hover {
+  background-color: rgba(248, 81, 73, 0.14);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Selectable Cards (Barber Preference & Services)
+   ========================================================================== */
+
+.selectable-card {
+  background: #0E0E13;
+  border: 1.5px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1rem 1.15rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
-  min-height: 60px;
+  min-height: 64px;
   position: relative;
 }
 
 .selectable-card:hover:not(.disabled) {
-  border-color: var(--accent-gold);
-  background-color: var(--bg-card-hover);
+  border-color: var(--accent-color);
+  background: #15151C;
   transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
 }
 
 .selectable-card.selected {
-  border-color: var(--accent-gold);
-  background-color: var(--accent-gold-light);
-  box-shadow: var(--shadow-gold);
+  border-color: var(--accent-color) !important;
+  background: rgba(229, 195, 120, 0.12) !important;
+  box-shadow: 0 0 16px rgba(229, 195, 120, 0.18) !important;
 }
 
 .selectable-card.disabled {
@@ -143,40 +356,161 @@ body {
   filter: grayscale(0.5);
 }
 
-/* Barber Status Chips */
-.barber-chip {
-  background-color: var(--bg-charcoal);
+/* ==========================================================================
+   Live Waiting Queue Styling (Overrides Bootstrap White Table Clashes)
+   ========================================================================== */
+
+/* Forcefully reset all Bootstrap table variables so it never renders white */
+.table,
+.table > :not(caption) > * > *,
+.reception-table,
+.reception-table > :not(caption) > * > * {
+  background-color: transparent !important;
+  --bs-table-bg: transparent !important;
+  --bs-table-color: var(--text-secondary) !important;
+  --bs-table-hover-bg: rgba(229, 195, 120, 0.04) !important;
+  --bs-table-border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: none !important;
+}
+
+.reception-table-wrap {
+  border-radius: 14px;
+  overflow: hidden;
   border: 1px solid var(--border-color);
-  border-radius: 50px;
-  padding: 0.4rem 1rem;
-  display: inline-flex;
+  background: rgba(14, 14, 18, 0.85);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.reception-table {
+  width: 100%;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.reception-table thead th {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  color: var(--accent-color) !important;
+  background-color: #121216 !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 1rem 1.15rem;
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.reception-table tbody td {
+  background-color: transparent !important;
+  color: var(--text-secondary) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  padding: 1rem 1.15rem;
+  vertical-align: middle;
+}
+
+.reception-table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+.reception-table tbody tr {
+  transition: background-color 0.18s ease;
+}
+
+.reception-table tbody tr:hover td {
+  background-color: rgba(229, 195, 120, 0.04) !important;
+}
+
+/* Highlighting Rule for Delay > 60m */
+.queue-row-delayed td {
+  border-left: 3px solid var(--amber-warning) !important;
+  background-color: rgba(217, 119, 6, 0.08) !important;
+}
+
+.queue-badge-delayed {
+  background-color: rgba(217, 119, 6, 0.2);
+  color: var(--amber-warning);
+  border: 1px solid var(--amber-warning);
+  animation: pulseAmberDelay 2.5s infinite ease-in-out;
+}
+
+/* Barber Station Card in Reception */
+.reception-barber-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 1.25rem;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.reception-barber-card:hover {
+  border-color: rgba(229, 195, 120, 0.35);
+  transform: translateY(-2px);
+}
+
+.reception-barber-card.is-busy {
+  border-left: 3px solid var(--barber-busy);
+}
+
+.reception-barber-card.is-free {
+  border-left: 3px solid var(--barber-free);
+}
+
+.reception-barber-card.is-break {
+  border-left: 3px solid var(--barber-break);
+  opacity: 0.85;
+}
+
+.in-chair-preview {
+  background: rgba(8, 8, 10, 0.7);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+}
+
+/* Modal Dialog */
+.glass-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: rgba(8, 8, 10, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  padding: 1rem;
 }
 
-.barber-avatar-sm {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--border-color);
+.glass-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  max-width: 520px;
+  width: 100%;
+  padding: 2rem;
+  box-shadow: var(--shadow-card-elevated);
+  animation: modalScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.barber-chip-free {
-  border-color: var(--barber-free);
-}
-.barber-chip-busy {
-  border-color: var(--barber-busy);
-}
-.barber-chip-break {
-  border-color: var(--barber-break);
-}
-
+/* Indicators */
 .dot-indicator {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   display: inline-block;
+}
+
+.dot-live {
+  background-color: var(--color-success);
+  box-shadow: 0 0 8px var(--color-success);
+  animation: pulseLiveDot 2s infinite ease-in-out;
+}
+
+.dot-offline {
+  background-color: var(--amber-warning);
+  box-shadow: 0 0 6px var(--amber-warning);
 }
 
 .dot-free {
@@ -194,75 +528,55 @@ body {
   box-shadow: 0 0 6px var(--barber-break);
 }
 
-/* Button & Accent Utilities */
-.btn-gold {
-  background-color: var(--accent-gold);
-  border: 1px solid var(--accent-gold);
-  color: var(--text-dark);
-  font-weight: 600;
-  padding: 0.5rem 1.25rem;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.btn-gold:hover, .btn-gold:focus {
-  background-color: var(--accent-gold-hover);
-  border-color: var(--accent-gold-hover);
-  color: #000000;
-  box-shadow: var(--shadow-gold);
-}
-
-.btn-outline-gold {
-  background-color: transparent;
-  border: 1px solid var(--accent-gold);
-  color: var(--accent-gold);
-  font-weight: 600;
-  padding: 0.5rem 1.25rem;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.btn-outline-gold:hover, .btn-outline-gold:focus {
-  background-color: var(--accent-gold);
-  color: var(--text-dark);
-}
-
 /* Badges */
-.badge-gold {
-  background-color: var(--accent-gold-light);
-  color: var(--accent-gold);
-  border: 1px solid var(--accent-gold);
+.badge-gold, .badge-accent {
+  background: var(--gold-gradient-subtle);
+  color: var(--accent-color);
+  border: 1px solid rgba(229, 195, 120, 0.3);
 }
 
 .badge-status-waiting {
   background-color: var(--status-waiting-bg);
   color: var(--status-waiting);
-  border: 1px solid var(--status-waiting);
+  border: 1px solid rgba(217, 119, 6, 0.4);
 }
 
 .badge-status-called {
   background-color: var(--status-called-bg);
   color: var(--status-called);
-  border: 1px solid var(--status-called);
+  border: 1px solid rgba(56, 189, 248, 0.4);
   animation: pulse-called 2s infinite ease-in-out;
 }
 
 .badge-status-in-chair {
   background-color: var(--status-in-chair-bg);
   color: var(--status-in-chair);
-  border: 1px solid var(--status-in-chair);
+  border: 1px solid rgba(46, 160, 67, 0.4);
 }
 
 .badge-status-done {
   background-color: var(--status-done-bg);
   color: var(--status-done);
-  border: 1px solid var(--status-done);
+  border: 1px solid rgba(156, 163, 175, 0.4);
 }
 
 .badge-status-noshow {
   background-color: var(--status-noshow-bg);
   color: var(--status-noshow);
-  border: 1px solid var(--status-noshow);
+  border: 1px solid rgba(248, 81, 73, 0.4);
+}
+
+.badge-status-cancelled {
+  background-color: var(--status-cancelled-bg);
+  color: var(--status-cancelled);
+  border: 1px solid rgba(156, 163, 175, 0.4);
+}
+
+/* Sticky Summary Card */
+.sticky-summary {
+  position: sticky;
+  top: 90px;
+  z-index: 10;
 }
 
 /* Animations */
@@ -281,23 +595,55 @@ body {
   }
 }
 
-@keyframes pulse-called {
+@keyframes modalScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulseLiveDot {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 4px var(--color-success);
+    opacity: 1;
   }
   50% {
-    box-shadow: 0 0 12px 4px rgba(59, 130, 246, 0.6);
+    box-shadow: 0 0 10px var(--color-success);
+    opacity: 0.6;
   }
 }
 
-/* Sticky Summary Card */
-.sticky-summary {
-  position: sticky;
-  top: 80px;
-  z-index: 10;
+@keyframes pulseAmberDelay {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 10px 2px rgba(217, 119, 6, 0.6);
+  }
 }
 
-/* Reduced Motion Support */
+@keyframes pulse-called {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 12px 3px rgba(56, 189, 248, 0.6);
+  }
+}
+
+@keyframes shimmerToken {
+  0% {
+    left: -80%;
+  }
+  100% {
+    left: 150%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

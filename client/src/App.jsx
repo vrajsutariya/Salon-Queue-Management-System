@@ -17,9 +17,9 @@ function App() {
   return (
     <LanguageProvider>
       <BrowserRouter>
-        <div className="d-flex flex-column min-vh-100" style={{ backgroundColor: 'var(--bg-dark)' }}>
+        <div className="d-flex flex-column min-vh-100 position-relative" style={{ backgroundColor: 'var(--bg-deep)' }}>
           <Navbar />
-          <main className="flex-grow-1">
+          <main className="flex-grow-1 pt-2 pt-md-3">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/join" element={<JoinQueue />} />

@@ -84,4 +84,49 @@ router.get('/barbers', async (req, res) => {
   }
 });
 
+/**
+ * PATCH /api/barbers/:id/status
+ * Update barber status (free, busy, break) and duty state
+ */
+router.patch('/barbers/:id/status', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, isOnDuty } = req.body;
+
+    const barber = await Barber.findById(id);
+    if (!barber) {
+      return res.status(404).json({ success: false, message: 'Barber not found.' });
+    }
+
+    if (status) {
+      const validStatuses = ['free', 'busy', 'break'];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ success: false, message: 'Invalid status value.' });
+      }
+      barber.status = status;
+    }
+
+    if (typeof isOnDuty === 'boolean') {
+      barber.isOnDuty = isOnDuty;
+    }
+
+    await barber.save();
+
+    if (req.io) {
+      req.io.emit('barber:updated', {
+        barberId: barber._id,
+        name: barber.name,
+        status: barber.status,
+        isOnDuty: barber.isOnDuty,
+      });
+      req.io.emit('queue:updated', { action: 'barber_status_change' });
+    }
+
+    res.json({ success: true, message: `Barber ${barber.name} status updated to ${barber.status}.`, barber });
+  } catch (error) {
+    console.error('Error updating barber status:', error);
+    res.status(500).json({ success: false, message: 'Server error updating barber status.' });
+  }
+});
+
 export default router;
