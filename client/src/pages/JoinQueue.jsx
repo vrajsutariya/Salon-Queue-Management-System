@@ -51,11 +51,13 @@ export const JoinQueue = () => {
     fetchData();
 
     const handleUpdate = () => fetchData();
+    socket.on('connect', handleUpdate);
     socket.on('queue:updated', handleUpdate);
     socket.on('salon:status-changed', handleUpdate);
     socket.on('services:updated', handleUpdate);
 
     return () => {
+      socket.off('connect', handleUpdate);
       socket.off('queue:updated', handleUpdate);
       socket.off('salon:status-changed', handleUpdate);
       socket.off('services:updated', handleUpdate);

@@ -31,11 +31,13 @@ export const Home = () => {
     fetchStatus();
 
     const handleQueueUpdated = () => fetchStatus();
+    socket.on('connect', handleQueueUpdated);
     socket.on('queue:updated', handleQueueUpdated);
     socket.on('salon:status-changed', handleQueueUpdated);
     const interval = setInterval(fetchStatus, 15000);
 
     return () => {
+      socket.off('connect', handleQueueUpdated);
       socket.off('queue:updated', handleQueueUpdated);
       socket.off('salon:status-changed', handleQueueUpdated);
       clearInterval(interval);
@@ -116,12 +118,24 @@ export const Home = () => {
       </motion.div>
 
       {error && (
-        <div className="alert alert-warning d-flex align-items-center justify-content-between mb-4 rounded-3" role="alert">
+        <div className="alert alert-warning d-flex flex-wrap align-items-center justify-content-between mb-4 rounded-3 gap-2" role="alert">
           <div className="d-flex align-items-center gap-2">
             <i className="bi bi-exclamation-triangle-fill text-warning fs-5"></i>
-            <span>{error}</span>
+            <div>
+              <div className="fw-semibold">{error}</div>
+              <div className="small text-muted" style={{ fontSize: '0.82rem' }}>
+                {t('coldStartHint')}
+              </div>
+            </div>
           </div>
-          <button className="btn btn-sm btn-outline-dark" onClick={fetchStatus}>
+          <button
+            className="btn btn-sm btn-outline-dark fw-semibold px-3"
+            onClick={() => {
+              setLoading(true);
+              setError(null);
+              fetchStatus();
+            }}
+          >
             {t('retry')}
           </button>
         </div>

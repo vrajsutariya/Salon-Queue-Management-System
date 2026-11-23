@@ -68,6 +68,7 @@ export const Reception = () => {
     const handleTicketCancelled = () => fetchDashboardData();
     const handleBarberUpdated = () => fetchDashboardData();
 
+    socket.on('connect', handleQueueUpdated);
     socket.on('queue:updated', handleQueueUpdated);
     socket.on('ticket:called', handleTicketCalled);
     socket.on('ticket:started', handleQueueUpdated);
@@ -80,6 +81,7 @@ export const Reception = () => {
     const pollInterval = setInterval(fetchDashboardData, 15000);
 
     return () => {
+      socket.off('connect', handleQueueUpdated);
       socket.off('queue:updated', handleQueueUpdated);
       socket.off('ticket:called', handleTicketCalled);
       socket.off('ticket:started', handleQueueUpdated);

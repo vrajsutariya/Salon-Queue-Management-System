@@ -52,6 +52,7 @@ export const BarberView = () => {
     const handleQueueUpdated = () => fetchBarberStationData();
     const handleBarberUpdated = () => fetchBarberStationData();
 
+    socket.on('connect', handleQueueUpdated);
     socket.on('queue:updated', handleQueueUpdated);
     socket.on('ticket:called', handleQueueUpdated);
     socket.on('ticket:started', handleQueueUpdated);
@@ -64,6 +65,7 @@ export const BarberView = () => {
     const interval = setInterval(fetchBarberStationData, 10000);
 
     return () => {
+      socket.off('connect', handleQueueUpdated);
       socket.off('queue:updated', handleQueueUpdated);
       socket.off('ticket:called', handleQueueUpdated);
       socket.off('ticket:started', handleQueueUpdated);

@@ -63,7 +63,10 @@ export const MyStatus = () => {
     fetchTicket();
 
     // Socket connection status
-    const onConnect = () => setIsSocketConnected(true);
+    const onConnect = () => {
+      setIsSocketConnected(true);
+      fetchTicket();
+    };
     const onDisconnect = () => setIsSocketConnected(false);
 
     // Queue real-time listeners

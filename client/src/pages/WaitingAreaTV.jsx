@@ -72,6 +72,7 @@ export const WaitingAreaTV = () => {
       }
     };
 
+    socket.on('connect', handleQueueUpdated);
     socket.on('queue:updated', handleQueueUpdated);
     socket.on('ticket:called', handleTicketCalled);
     socket.on('ticket:started', handleQueueUpdated);
@@ -84,6 +85,7 @@ export const WaitingAreaTV = () => {
     const interval = setInterval(fetchTVData, 10000);
 
     return () => {
+      socket.off('connect', handleQueueUpdated);
       socket.off('queue:updated', handleQueueUpdated);
       socket.off('ticket:called', handleTicketCalled);
       socket.off('ticket:started', handleQueueUpdated);
