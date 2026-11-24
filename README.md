@@ -1,13 +1,14 @@
 # Salon Queue Management System
 
-**Live demo:** https://salon-queue-management-system.vercel.app  
+**Live demo:** https://salon-queue-management-system-nu.vercel.app
 **Hosted on:** Vercel (frontend) + Render (backend)  
 **Staff / Admin PIN:** `1234`  
 **Staff & Station Portals:**
+
 - **Receptionist Dashboard:** [`/reception`](https://salon-queue-management-system.vercel.app/reception)
 - **Barber Station Views:** [`/barber/Ravi`](https://salon-queue-management-system.vercel.app/barber/Ravi) • [`/barber/Amit`](https://salon-queue-management-system.vercel.app/barber/Amit) • [`/barber/Imran`](https://salon-queue-management-system.vercel.app/barber/Imran)
 - **Waiting Area TV Display:** [`/display`](https://salon-queue-management-system.vercel.app/display)
-- **Owner Admin Panel:** [`/admin`](https://salon-queue-management-system.vercel.app/admin) *(Protected by PIN: `1234`)*
+- **Owner Admin Panel:** [`/admin`](https://salon-queue-management-system.vercel.app/admin) _(Protected by PIN: `1234`)_
 
 <p align="center">
   <img src="https://img.shields.io/badge/Crown%20%26%20Blade-Queue%20System-D4A017?style=for-the-badge&logo=target&logoColor=white" alt="Crown & Blade Logo" />
@@ -80,14 +81,14 @@ All device views synchronize state bidirectionally in under **50 milliseconds** 
 
 ## ⚡ The Problem vs. The Salon Queue Solution
 
-| Traditional Walk-in Barbershop Experience | The Crown & Blade Digital Queue Solution |
-| :--- | :--- |
-| **Unpredictable Lobby Crowds:** Customers wait 1–2 hours without knowing when their turn is. | **Real-Time Turn Tracking:** Customers see their live token (`S-14`), queue position (`4th in line`), and dynamic countdown. |
-| **Disputed Turn Disputes:** Clients argue over who arrived first when seats open up. | **Strict FIFO & Allocation Engine:** Mathematical queue ordering with fair first-come, first-served dispatching. |
+| Traditional Walk-in Barbershop Experience                                                                 | The Crown & Blade Digital Queue Solution                                                                                             |
+| :-------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
+| **Unpredictable Lobby Crowds:** Customers wait 1–2 hours without knowing when their turn is.              | **Real-Time Turn Tracking:** Customers see their live token (`S-14`), queue position (`4th in line`), and dynamic countdown.         |
+| **Disputed Turn Disputes:** Clients argue over who arrived first when seats open up.                      | **Strict FIFO & Allocation Engine:** Mathematical queue ordering with fair first-come, first-served dispatching.                     |
 | **Stylist Idleness & Disorganization:** Barbers repeatedly walk to the reception desk to ask who is next. | **Dedicated Station Views (`/barber/:name`):** Stylists see their immediate queue and tap `Start` / `Done` directly at their mirror. |
-| **Lobby Noise & Missed Callouts:** Receptionists shout client names over blowdryers and clippers. | **Lobby TV with Audio Chimes (`/display`):** 10-foot display flashes gold and chimes automatically on client callouts. |
-| **Ghost Clients Stalling the Queue:** Customers leave without notifying staff, blocking chairs. | **10-Minute No-Show Escalation:** Auto-highlighting of expired tickets; re-added customers go strictly to the end of the line. |
-| **Language Barriers:** Non-English patrons struggle with service sheets and ticket numbers. | **Native Dual-Language (English & Gujarati):** Instant bilingual switching with 100% dictionary coverage. |
+| **Lobby Noise & Missed Callouts:** Receptionists shout client names over blowdryers and clippers.         | **Lobby TV with Audio Chimes (`/display`):** 10-foot display flashes gold and chimes automatically on client callouts.               |
+| **Ghost Clients Stalling the Queue:** Customers leave without notifying staff, blocking chairs.           | **10-Minute No-Show Escalation:** Auto-highlighting of expired tickets; re-added customers go strictly to the end of the line.       |
+| **Language Barriers:** Non-English patrons struggle with service sheets and ticket numbers.               | **Native Dual-Language (English & Gujarati):** Instant bilingual switching with 100% dictionary coverage.                            |
 
 ---
 
@@ -96,30 +97,34 @@ All device views synchronize state bidirectionally in under **50 milliseconds** 
 The platform implements all **7 distinct screens** detailed in [`docs/02-screens.md`](docs/02-screens.md):
 
 ### 1. Screen 1: Home Landing Page (`/`)
+
 - **Real-Time Salon Status Badge:** Live indicator showing `Open · Closes 9:00 PM` or `Queue Closed`.
-- **Live Waiting Counter:** Dynamically updates (e.g., *"6 people waiting · about 50 min"* or *"No one waiting — walk right in!"*).
+- **Live Waiting Counter:** Dynamically updates (e.g., _"6 people waiting · about 50 min"_ or _"No one waiting — walk right in!"_).
 - **Barber Roster Chips:** Live status of all on-duty barbers (e.g., `Ravi (Busy)`, `Amit (Available)`, `Imran (On Break)`).
 - **Hero CTA:** Primary gold button `[ Join Queue ]` linking directly to `/join`.
 - **Portal Quick Access Grid:** Quick shortcuts for staff, barbers, lobby TV, and owner admin.
 - **Global Navigation Bar:** Crown & Blade branding, active screen indicator, and one-click **English / Gujarati (`ગુજરાતી`)** language switcher.
 
 ### 2. Screen 2: Join Queue (`/join`)
+
 - **Customer Identity:** Customer Name and 10-digit Indian mobile number validation (`/^[6-9]\d{9}$/`).
 - **Duplicate Prevention:** If a customer with an active ticket attempts to register again, the system rejects the duplicate (HTTP `409 Conflict`) and automatically redirects them to their active status page.
-- **Multi-Service Selector (Max 3):** Interactive cards displaying service duration and pricing in INR (₹) (e.g., *Haircut 30m ₹150*, *Beard Trim 15m ₹80*, *Hair Spa 45m ₹400*, *Head Massage 20m ₹150*).
+- **Multi-Service Selector (Max 3):** Interactive cards displaying service duration and pricing in INR (₹) (e.g., _Haircut 30m ₹150_, _Beard Trim 15m ₹80_, _Hair Spa 45m ₹400_, _Head Massage 20m ₹150_).
 - **Barber Preference Picker:** Choose between `Any barber (fastest)` (shared load-balanced pool) or a specific stylist card.
 - **Dynamic Live Cost & Wait Estimator:** Automatically recalculates total minutes, total ₹ price, and dynamic expected wait time before confirming.
 - **Submission:** Submits payload and smoothly redirects directly to the customer's personal `/status/:id` page.
 
 ### 3. Screen 3: My Status & Live Tracking (`/status/:id`)
-- **Prominent Token Badge:** Displays high-contrast ticket token (e.g., `S-14`) and live rank (e.g., *"4th in line"*).
+
+- **Prominent Token Badge:** Displays high-contrast ticket token (e.g., `S-14`) and live rank (e.g., _"4th in line"_).
 - **Auto-Updating Wait Countdown:** Real-time minutes countdown recalculated on every queue event.
 - **Smart Staged Banners:**
-  - **When 2nd in Line:** Warning banner alerts: *"Start coming to the salon — your turn is very soon!"*
-  - **When Called:** Dramatic full-screen champagne gold alert modal: *"It's your turn! Please proceed to Station with Ravi"* accompanied by subtle vibration.
+  - **When 2nd in Line:** Warning banner alerts: _"Start coming to the salon — your turn is very soon!"_
+  - **When Called:** Dramatic full-screen champagne gold alert modal: _"It's your turn! Please proceed to Station with Ravi"_ accompanied by subtle vibration.
 - **Customer Cancellation:** Allows the customer to release their spot voluntarily with a modal confirmation.
 
 ### 4. Screen 4: Receptionist Command Dashboard (`/reception`)
+
 - **Designed for Tablets in Landscape & Desktops:**
 - **Barber Overview Cards:** High-level status cards for each barber showing current client, elapsed service time progress bar, and 1-click `[ Call Next ]` button.
 - **Interactive Waiting List:** Chronological table displaying Token #, Customer Name, Contact, Services, Preferred Barber, Waiting Duration, and Quick Actions.
@@ -128,13 +133,15 @@ The platform implements all **7 distinct screens** detailed in [`docs/02-screens
 - **Lifecycle Actions:** One-click triggers for `Call Next`, `Start`, `Done`, `No-Show`, and `Cancel`.
 
 ### 5. Screen 5: Barber Station View (`/barber/:name`)
+
 - **Station-Specific Console (Mobile / Tablet Mounted):** Direct URL access for stylists: `/barber/Ravi`, `/barber/Amit`, `/barber/Imran`.
 - **"Now In Chair" Panel:** Prominently highlights the active customer, service list, and live elapsed timer since service started.
 - **One-Touch Progression:** High-visibility buttons: `[ Start Service ]` $\rightarrow$ `[ Service Done ]`.
 - **"Next Up For You" Queue:** Shows upcoming clients assigned to this specific barber or drawn from the unassigned "Any" pool.
-- **Barber Availability Switch:** Stylists can toggle between `Available` and `On Break`. Customers selecting that barber see a live notice (*"Ravi is on break"*).
+- **Barber Availability Switch:** Stylists can toggle between `Available` and `On Break`. Customers selecting that barber see a live notice (_"Ravi is on break"_).
 
 ### 6. Screen 6: Waiting Area TV / 10-Foot Public Display (`/display`)
+
 - **1080p/4K TV Optimized 10-Foot UI:** High-contrast, dark-mode display readable from 5+ meters.
 - **Split Screen Layout:**
   - **Left ("Now Serving"):** Active barber stations, stylist photos, and active ticket tokens.
@@ -142,6 +149,7 @@ The platform implements all **7 distinct screens** detailed in [`docs/02-screens
 - **Audio-Visual Chime:** Uses the Web Audio API to produce an elegant salon chime (sine wave chord $\text{E}_5 \rightarrow \text{B}_5$) and flashes the screen gold whenever a new token is called.
 
 ### 7. Screen 7: Owner Admin Console & Analytics (`/admin`)
+
 - **4-Digit PIN Security:** Protected by default PIN (`1234`) with animated shake feedback on incorrect input.
 - **Master Queue Switch:** Instant toggle to Open or Close online queue registration. When closed, walk-in arrivals are still permitted at the desk.
 - **Real-Time Daily Analytics:**
@@ -192,6 +200,7 @@ Queue transitions are strictly forward-progressing and non-reversible:
 ### 2. Smart Barber Allocation & Load Balancing
 
 When a customer joins the queue:
+
 1. **Specific Barber Requested (e.g., "Ravi"):**
    - The ticket enters Ravi's dedicated queue.
    - **Strict Guarantee:** A customer who selected Ravi will **never** be dispatched to Amit or Imran, even if Amit calls next.
@@ -206,14 +215,17 @@ When a customer joins the queue:
 Wait time calculations are centralized in [`server/utils/queueRules.js`](server/utils/queueRules.js):
 
 #### General "Any Barber" Wait Time Formula:
+
 $$\text{Estimated Wait Time (mins)} = \frac{\sum_{i \in \text{Ahead}} \text{Duration}(i) + \sum_{c \in \text{InChair}} \text{RemainingTime}(c)}{\max(1, \text{Active On-Duty Barbers})}$$
 
 Where:
+
 - $\text{Duration}(i)$: Total duration of selected services for client $i$.
 - $\text{RemainingTime}(c) = \max(0, \text{TotalDuration}(c) - \text{ElapsedMinutes}(c))$.
 - $\text{Active On-Duty Barbers}$: Count of logged-in barbers currently set to `isOnDuty: true` and not on break.
 
 #### Specific Barber Wait Time Formula:
+
 For a customer who selected a specific barber $B$, wait time is localized to barber $B$:
 $$\text{Estimated Wait Time (Specific)} = \text{RemainingTime}(c_B) + \sum_{j \in \text{Ahead for } B} \text{Duration}(j)$$
 
@@ -232,10 +244,12 @@ $$\text{Estimated Wait Time (Specific)} = \text{RemainingTime}(c_B) + \sum_{j \i
 ## 🌐 Dual-Language Localization (EN / GU)
 
 The entire application provides complete bilingual support:
+
 - **English (`EN`)**
 - **Gujarati (`GU` - ગુજરાતી)**
 
 ### Architecture:
+
 - All user-facing strings are strictly extracted into [`client/src/locales/translations.js`](client/src/locales/translations.js).
 - Components consume translations via a shared React `LanguageContext` (`useLanguage()` hook with `t('key')` helper).
 - **Zero Hardcoded English Strings:** Navigation, buttons, headings, countdowns, status badges, errors, and modal confirmations are 100% localized.
@@ -302,17 +316,17 @@ flowchart TD
 
 ## 💻 Technology Stack
 
-| Layer | Technologies | Purpose |
-| :--- | :--- | :--- |
-| **Frontend Framework** | **React 18.3**, React Router DOM 6 | Single-Page Application (SPA) architecture |
-| **Build & Tooling** | **Vite 5.4**, Rollup | Lightning-fast development & optimized production bundling |
-| **Styling & Icons** | **Bootstrap 5.3**, Bootstrap Icons, Custom CSS Variables | Responsive grid, accessible utilities, and dark luxury tokens |
-| **Animations** | **Framer Motion 14** | Smooth card transitions, pulsing callout alerts, modal entries |
-| **Real-Time Client** | **Socket.io Client 4.8** | Low-latency state synchronization without page reloads |
-| **Backend Runtime** | **Node.js (v20+)**, Express 4.21 | REST API endpoints, routing, and controller dispatching |
-| **Real-Time Server** | **Socket.io 4.8** | WebSocket server broadcasting queue transitions |
-| **Database ODM** | **MongoDB**, **Mongoose 8.8** | Persistent schemas for Tickets, Barbers, Services, Settings |
-| **Audio Notification** | **Web Audio API** | Synthesized browser chord chime for TV lobby notifications |
+| Layer                  | Technologies                                             | Purpose                                                        |
+| :--------------------- | :------------------------------------------------------- | :------------------------------------------------------------- |
+| **Frontend Framework** | **React 18.3**, React Router DOM 6                       | Single-Page Application (SPA) architecture                     |
+| **Build & Tooling**    | **Vite 5.4**, Rollup                                     | Lightning-fast development & optimized production bundling     |
+| **Styling & Icons**    | **Bootstrap 5.3**, Bootstrap Icons, Custom CSS Variables | Responsive grid, accessible utilities, and dark luxury tokens  |
+| **Animations**         | **Framer Motion 14**                                     | Smooth card transitions, pulsing callout alerts, modal entries |
+| **Real-Time Client**   | **Socket.io Client 4.8**                                 | Low-latency state synchronization without page reloads         |
+| **Backend Runtime**    | **Node.js (v20+)**, Express 4.21                         | REST API endpoints, routing, and controller dispatching        |
+| **Real-Time Server**   | **Socket.io 4.8**                                        | WebSocket server broadcasting queue transitions                |
+| **Database ODM**       | **MongoDB**, **Mongoose 8.8**                            | Persistent schemas for Tickets, Barbers, Services, Settings    |
+| **Audio Notification** | **Web Audio API**                                        | Synthesized browser chord chime for TV lobby notifications     |
 
 ---
 
@@ -397,25 +411,31 @@ Salon-Queue-Management-System/
 ### Installation & Setup
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/vrajsutariya/Salon-Queue-Management-System.git
    cd Salon-Queue-Management-System
    ```
 
 2. **Install all dependencies:**
+
    ```bash
    # From the project root:
    npm run install:all
    ```
-   *(Or individually inside `cd server && npm install` and `cd client && npm install`)*.
+
+   _(Or individually inside `cd server && npm install` and `cd client && npm install`)_.
 
 3. **Configure Environment Variables:**
 
    **Backend Configuration (`server/.env`):**
+
    ```bash
    cp server/.env.example server/.env
    ```
-   *Edit `server/.env` if using a custom MongoDB connection or port:*
+
+   _Edit `server/.env` if using a custom MongoDB connection or port:_
+
    ```dotenv
    PORT=5000
    MONGODB_URI=mongodb://127.0.0.1:27017/salon_queue
@@ -424,10 +444,13 @@ Salon-Queue-Management-System/
    ```
 
    **Frontend Configuration (`client/.env`):**
+
    ```bash
    cp client/.env.example client/.env
    ```
-   *Default contents:*
+
+   _Default contents:_
+
    ```dotenv
    VITE_SERVER_URL=http://localhost:5000
    ```
@@ -439,6 +462,7 @@ Salon-Queue-Management-System/
 Open two terminal windows:
 
 **Terminal 1 — Start the Backend Server:**
+
 ```bash
 npm run dev:server
 # Server runs on: http://localhost:5000
@@ -446,6 +470,7 @@ npm run dev:server
 ```
 
 **Terminal 2 — Start the Frontend Development Client:**
+
 ```bash
 npm run dev:client
 # Frontend runs on: http://localhost:5173
@@ -459,17 +484,17 @@ Now open [http://localhost:5173](http://localhost:5173) on your phone or browser
 
 For evaluation, grading, and demonstration, the following routes and access credentials are pre-configured:
 
-| Portal | URL Path | Role / Purpose | Access / PIN |
-| :--- | :--- | :--- | :--- |
-| **Customer Home** | `/` | Central gateway & live salon counter | *Public* |
-| **Join Queue** | `/join` | Self-service queue registration | *Public* |
-| **My Status** | `/status/:id` | Live customer token & countdown tracking | *Via Ticket ID* |
-| **Receptionist Desk** | `/reception` | Front-desk walk-in & queue coordinator | *Public staff portal* |
-| **Barber Station (Ravi)** | `/barber/Ravi` | Stylist console for Ravi | *Public station view* |
-| **Barber Station (Amit)** | `/barber/Amit` | Stylist console for Amit | *Public station view* |
-| **Barber Station (Imran)** | `/barber/Imran`| Stylist console for Imran | *Public station view* |
-| **Waiting Area TV** | `/display` | High-contrast 10-foot lobby display | *Public 1080p display* |
-| **Owner Admin Console** | `/admin` | Operational settings, stats & catalog | **PIN: `1234`** |
+| Portal                     | URL Path        | Role / Purpose                           | Access / PIN           |
+| :------------------------- | :-------------- | :--------------------------------------- | :--------------------- |
+| **Customer Home**          | `/`             | Central gateway & live salon counter     | _Public_               |
+| **Join Queue**             | `/join`         | Self-service queue registration          | _Public_               |
+| **My Status**              | `/status/:id`   | Live customer token & countdown tracking | _Via Ticket ID_        |
+| **Receptionist Desk**      | `/reception`    | Front-desk walk-in & queue coordinator   | _Public staff portal_  |
+| **Barber Station (Ravi)**  | `/barber/Ravi`  | Stylist console for Ravi                 | _Public station view_  |
+| **Barber Station (Amit)**  | `/barber/Amit`  | Stylist console for Amit                 | _Public station view_  |
+| **Barber Station (Imran)** | `/barber/Imran` | Stylist console for Imran                | _Public station view_  |
+| **Waiting Area TV**        | `/display`      | High-contrast 10-foot lobby display      | _Public 1080p display_ |
+| **Owner Admin Console**    | `/admin`        | Operational settings, stats & catalog    | **PIN: `1234`**        |
 
 > **Pro Tip:** To experience the multi-device real-time sync, open `/reception` on your computer screen, `/display` on a second monitor or tab, and `/join` on your mobile phone!
 
@@ -480,44 +505,48 @@ For evaluation, grading, and demonstration, the following routes and access cred
 ### REST API Endpoints
 
 #### Salon Operations
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/health` | Service health status, database state, active socket clients |
-| `GET` | `/api/salon/live-status` | Operational status (`Open`/`Closed`), waiting count, avg wait |
+
+| Method | Endpoint                 | Description                                                   |
+| :----- | :----------------------- | :------------------------------------------------------------ |
+| `GET`  | `/api/health`            | Service health status, database state, active socket clients  |
+| `GET`  | `/api/salon/live-status` | Operational status (`Open`/`Closed`), waiting count, avg wait |
 
 #### Queue Management
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `POST` | `/api/queue/join` | Join online queue (`customerName`, `phone`, `services`, `preferredBarber`) |
-| `POST` | `/api/queue/walkin` | Receptionist walk-in entry |
-| `GET` | `/api/queue` | List queue tickets (supports `?status=waiting,called,in-chair`) |
-| `GET` | `/api/queue/:id` | Fetch specific ticket status, position, and dynamic wait time |
-| `POST` | `/api/queue/call-next` | Barber draws next eligible customer (`{ barberId }`) |
-| `POST` | `/api/queue/:id/start` | Transition ticket to `in-chair` |
-| `POST` | `/api/queue/:id/done` | Transition ticket to `done` |
-| `POST` | `/api/queue/:id/no-show` | Mark ticket as `no-show` (if client fails to arrive in 10 mins) |
-| `POST` | `/api/queue/:id/cancel` | Cancel ticket (released from queue) |
-| `PATCH`| `/api/queue/:id/status` | General status update route with state machine validation |
+
+| Method  | Endpoint                 | Description                                                                |
+| :------ | :----------------------- | :------------------------------------------------------------------------- |
+| `POST`  | `/api/queue/join`        | Join online queue (`customerName`, `phone`, `services`, `preferredBarber`) |
+| `POST`  | `/api/queue/walkin`      | Receptionist walk-in entry                                                 |
+| `GET`   | `/api/queue`             | List queue tickets (supports `?status=waiting,called,in-chair`)            |
+| `GET`   | `/api/queue/:id`         | Fetch specific ticket status, position, and dynamic wait time              |
+| `POST`  | `/api/queue/call-next`   | Barber draws next eligible customer (`{ barberId }`)                       |
+| `POST`  | `/api/queue/:id/start`   | Transition ticket to `in-chair`                                            |
+| `POST`  | `/api/queue/:id/done`    | Transition ticket to `done`                                                |
+| `POST`  | `/api/queue/:id/no-show` | Mark ticket as `no-show` (if client fails to arrive in 10 mins)            |
+| `POST`  | `/api/queue/:id/cancel`  | Cancel ticket (released from queue)                                        |
+| `PATCH` | `/api/queue/:id/status`  | General status update route with state machine validation                  |
 
 #### Barbers & Services
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/barbers` | Retrieve list of on-duty barbers and current statuses |
-| `GET` | `/api/barbers/:identifier` | Fetch individual barber station data by name or ID |
-| `PATCH`| `/api/barbers/:id/status` | Update barber availability (`free`, `busy`, `break`, `isOnDuty`) |
-| `POST` | `/api/barbers/:name/toggle-break`| Stylist quick-toggle for break state |
-| `GET` | `/api/services` | Retrieve active services (supports `?all=true` for admin) |
-| `POST` | `/api/services` | Add new service to catalog |
-| `PUT` | `/api/services/:id` | Update service pricing, duration, or bilingual names |
-| `DELETE`| `/api/services/:id` | Remove service from catalog |
+
+| Method   | Endpoint                          | Description                                                      |
+| :------- | :-------------------------------- | :--------------------------------------------------------------- |
+| `GET`    | `/api/barbers`                    | Retrieve list of on-duty barbers and current statuses            |
+| `GET`    | `/api/barbers/:identifier`        | Fetch individual barber station data by name or ID               |
+| `PATCH`  | `/api/barbers/:id/status`         | Update barber availability (`free`, `busy`, `break`, `isOnDuty`) |
+| `POST`   | `/api/barbers/:name/toggle-break` | Stylist quick-toggle for break state                             |
+| `GET`    | `/api/services`                   | Retrieve active services (supports `?all=true` for admin)        |
+| `POST`   | `/api/services`                   | Add new service to catalog                                       |
+| `PUT`    | `/api/services/:id`               | Update service pricing, duration, or bilingual names             |
+| `DELETE` | `/api/services/:id`               | Remove service from catalog                                      |
 
 #### Admin Operations
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `POST` | `/api/admin/verify-pin` | Verifies owner PIN (`1234`) to unlock admin portal |
-| `GET` | `/api/admin/settings` | Returns salon operational settings |
-| `POST` | `/api/admin/queue-toggle` | Master switch to Open or Close online queue registration |
-| `GET` | `/api/admin/stats` | Today's analytics: customers served, avg wait, no-shows, revenue |
+
+| Method | Endpoint                  | Description                                                      |
+| :----- | :------------------------ | :--------------------------------------------------------------- |
+| `POST` | `/api/admin/verify-pin`   | Verifies owner PIN (`1234`) to unlock admin portal               |
+| `GET`  | `/api/admin/settings`     | Returns salon operational settings                               |
+| `POST` | `/api/admin/queue-toggle` | Master switch to Open or Close online queue registration         |
+| `GET`  | `/api/admin/stats`        | Today's analytics: customers served, avg wait, no-shows, revenue |
 
 ---
 
@@ -525,15 +554,15 @@ For evaluation, grading, and demonstration, the following routes and access cred
 
 The system uses dedicated WebSocket channels for immediate, sub-50ms multi-device synchronization:
 
-| Event Name | Direction | Payload Description |
-| :--- | :--- | :--- |
-| `queue:updated` | Server $\rightarrow$ Clients | Broadcast when any ticket joins, updates, or leaves the queue |
-| `ticket:called` | Server $\rightarrow$ Clients | Triggered when a customer is called (triggers TV chime & customer turn modal) |
-| `ticket:started` | Server $\rightarrow$ Clients | Triggered when customer sits in chair (`in-chair`) |
-| `ticket:done` | Server $\rightarrow$ Clients | Triggered when service completes (`done`) |
-| `ticket:cancelled` | Server $\rightarrow$ Clients | Triggered when ticket is cancelled |
-| `barber:status-changed` | Server $\rightarrow$ Clients | Broadcast when a barber switches between Free, Busy, or Break |
-| `salon:status-changed` | Server $\rightarrow$ Clients | Broadcast when the salon queue is Opened or Closed |
+| Event Name              | Direction                    | Payload Description                                                           |
+| :---------------------- | :--------------------------- | :---------------------------------------------------------------------------- |
+| `queue:updated`         | Server $\rightarrow$ Clients | Broadcast when any ticket joins, updates, or leaves the queue                 |
+| `ticket:called`         | Server $\rightarrow$ Clients | Triggered when a customer is called (triggers TV chime & customer turn modal) |
+| `ticket:started`        | Server $\rightarrow$ Clients | Triggered when customer sits in chair (`in-chair`)                            |
+| `ticket:done`           | Server $\rightarrow$ Clients | Triggered when service completes (`done`)                                     |
+| `ticket:cancelled`      | Server $\rightarrow$ Clients | Triggered when ticket is cancelled                                            |
+| `barber:status-changed` | Server $\rightarrow$ Clients | Broadcast when a barber switches between Free, Busy, or Break                 |
+| `salon:status-changed`  | Server $\rightarrow$ Clients | Broadcast when the salon queue is Opened or Closed                            |
 
 ---
 
@@ -560,6 +589,7 @@ npm test
 10. **Multi-Device Real-Time Sync:** Establishes dual WebSocket clients and confirms state propagation across independent sockets in under 50ms.
 
 #### Additional Edge Case Tests Included:
+
 - **Strict State Machine Enforcement:** Rejects invalid backwards or skip transitions (e.g., `WAITING` directly to `DONE`) with HTTP `400 Bad Request`.
 - **Barber On Break Rule:** Verifies that calling next for a barber currently on break is rejected.
 
@@ -570,6 +600,7 @@ npm test
 The application is structured for instant zero-configuration deployment to free-tier cloud platforms:
 
 ### 1. Frontend Deployment (Vercel)
+
 1. Push your repository to GitHub.
 2. Sign in to [Vercel](https://vercel.com) and click **"Add New Project"**.
 3. Import your `Salon-Queue-Management-System` repository.
@@ -583,6 +614,7 @@ The application is structured for instant zero-configuration deployment to free-
 6. Deploy! Vercel will assign your live domain (e.g., `https://salon-queue-management-system.vercel.app`).
 
 ### 2. Backend Deployment (Render or Railway)
+
 1. Create a free managed database at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) and obtain your connection string:
    `mongodb+srv://<user>:<password>@cluster0.mongodb.net/salon_queue?retryWrites=true&w=majority`
 2. Sign in to [Render](https://render.com) and click **"New Web Service"**.

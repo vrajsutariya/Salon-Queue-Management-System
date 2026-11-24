@@ -46,10 +46,21 @@ export const Navbar = () => {
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         aria-label="Main Navigation"
       >
-        {/* Brand Logo */}
-        <div className="pe-2">
-          <BrandLogo size="sm" />
-        </div>
+        {/* Brand Logo & Name */}
+        <NavLink to="/" className="d-flex align-items-center gap-2 text-decoration-none pe-2">
+          <BrandLogo size="sm" to="" />
+          {/* <span
+            className="fw-bold"
+            style={{
+              fontFamily: "'Fraunces', serif",
+              fontSize: '1rem',
+              color: 'var(--heading-color)',
+              letterSpacing: '0.02em',
+            }}
+          >
+            Crown <span style={{ color: 'var(--accent-color)' }}>&amp;</span> Blade
+          </span> */}
+        </NavLink>
 
         {/* Snug Cohesive Navigation Links */}
         <div className="d-none d-lg-flex align-items-center gap-1 px-1">
@@ -101,40 +112,63 @@ export const Navbar = () => {
         </div>
       </motion.nav>
 
-      {/* Mobile Drawer Dropdown with Framer Motion */}
+      {/* Mobile Drawer Dropdown with Backdrop Overlay */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.98 }}
-            transition={{ duration: 0.2, ease: 'easeInOut' }}
-            className="d-lg-none mt-2 p-3 rounded-4 shadow-lg mx-auto"
-            style={{
-              maxWidth: '860px',
-              background: 'rgba(14, 14, 18, 0.96)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border: '1px solid rgba(229, 195, 120, 0.25)',
-              pointerEvents: 'auto',
-            }}
-          >
-            <div className="d-flex flex-column gap-2">
-              {navLinks.map((link) => (
-                <NavLink
-                  key={link.to}
-                  to={link.to}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={({ isActive }) =>
-                    `floating-nav-link w-100 py-2 px-3 ${isActive ? 'active' : ''}`
-                  }
-                >
-                  <i className={`bi ${link.icon} me-2 text-warning`}></i>
-                  <span>{link.label}</span>
-                </NavLink>
-              ))}
-            </div>
-          </motion.div>
+          <>
+            {/* Backdrop click-away overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="position-fixed d-lg-none"
+              style={{
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'rgba(0, 0, 0, 0.65)',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)',
+                zIndex: 1038,
+                pointerEvents: 'auto',
+              }}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              className="d-lg-none mt-2 p-3 rounded-4 shadow-lg mx-auto position-relative"
+              style={{
+                maxWidth: '860px',
+                background: 'rgba(14, 14, 18, 0.98)',
+                backdropFilter: 'blur(25px)',
+                WebkitBackdropFilter: 'blur(25px)',
+                border: '1px solid rgba(229, 195, 120, 0.3)',
+                zIndex: 1039,
+                pointerEvents: 'auto',
+              }}
+            >
+              <div className="d-flex flex-column gap-2">
+                {navLinks.map((link) => (
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `floating-nav-link w-100 py-3 px-3 d-flex align-items-center ${isActive ? 'active' : ''}`
+                    }
+                    style={{ minHeight: '48px', fontSize: '0.95rem' }}
+                  >
+                    <i className={`bi ${link.icon} me-3 text-warning fs-5`}></i>
+                    <span className="fw-medium">{link.label}</span>
+                  </NavLink>
+                ))}
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </header>

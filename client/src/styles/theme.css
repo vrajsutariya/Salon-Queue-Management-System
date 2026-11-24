@@ -823,6 +823,403 @@ p, .lead, small, span, div {
   transform: scale(1.15);
 }
 
+/* ==========================================================================
+   Circular Timer Component (Screen 3: My Status)
+   ========================================================================== */
+.circular-timer-container {
+  position: relative;
+  width: 175px;
+  height: 175px;
+  margin: 0 auto;
+}
+
+.circular-timer-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.circular-timer-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 9;
+}
+
+.circular-timer-progress {
+  fill: none;
+  stroke: url(#goldProgressGrad);
+  stroke-width: 9;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.circular-timer-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.circular-timer-time {
+  font-family: 'Fraunces', serif;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--heading-color);
+  line-height: 1;
+}
+
+.circular-timer-caption {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  margin-top: 0.35rem;
+}
+
+/* Hero Token Badge */
+.hero-token-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1.6rem;
+  border-radius: 9999px;
+  background: var(--gold-gradient-subtle);
+  border: 1.5px solid var(--accent-color);
+  box-shadow: 0 4px 20px rgba(229, 195, 120, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.hero-token-text {
+  font-family: 'Fraunces', serif;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+/* ==========================================================================
+   Mobile Bottom Navigation Dock (Recording & Handheld Perfection)
+   ========================================================================== */
+.mobile-nav-dock {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+  background: rgba(10, 10, 14, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: 1px solid rgba(229, 195, 120, 0.2);
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  padding: 0.4rem 0.5rem calc(0.4rem + env(safe-area-inset-bottom, 0px)) 0.5rem;
+  user-select: none;
+}
+
+.mobile-nav-dock-inner {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.mobile-nav-dock-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  color: var(--text-muted);
+  text-decoration: none !important;
+  padding: 0.35rem 0.55rem;
+  border-radius: 12px;
+  min-width: 58px;
+  min-height: 48px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-nav-dock-item:active {
+  transform: scale(0.92);
+}
+
+.mobile-nav-dock-icon-wrap {
+  position: relative;
+  font-size: 1.25rem;
+  line-height: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mobile-nav-dock-label {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.mobile-nav-dock-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent-color);
+  margin-top: 3px;
+  box-shadow: 0 0 6px var(--accent-color);
+}
+
+.mobile-nav-dock-item.active {
+  color: var(--accent-color) !important;
+}
+
+.mobile-nav-dock-item.active .mobile-nav-dock-label {
+  font-weight: 700;
+}
+
+.mobile-nav-dock-item.active i {
+  color: var(--accent-color) !important;
+  text-shadow: 0 0 12px rgba(229, 195, 120, 0.5);
+}
+
+/* ==========================================================================
+   Customer Turn Call & Ready Notifications (MyStatus)
+   ========================================================================== */
+.start-coming-banner {
+  background: linear-gradient(135deg, rgba(212, 160, 23, 0.15) 0%, rgba(31, 41, 55, 0.95) 100%);
+  border: 1px solid var(--accent-gold);
+  box-shadow: 0 4px 20px rgba(212, 160, 23, 0.2);
+  border-radius: 16px;
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.start-coming-icon-wrap {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: 50%;
+  background: rgba(212, 160, 23, 0.2);
+  color: var(--accent-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  animation: pulse-ring 2s infinite;
+}
+
+.gold-takeover-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(10, 10, 14, 0.96);
+  backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.takeover-content {
+  background: linear-gradient(180deg, rgba(31, 41, 55, 0.98) 0%, rgba(17, 24, 39, 0.99) 100%);
+  border: 2px solid var(--accent-gold);
+  box-shadow: 0 0 50px rgba(212, 160, 23, 0.35);
+  border-radius: 24px;
+  padding: 2.25rem 1.5rem;
+  width: 100%;
+  max-width: 460px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.rings-container {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pulse-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--accent-gold);
+  animation: takeover-pulsate 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+.pulse-ring:nth-child(2) {
+  animation-delay: 0.6s;
+}
+
+.pulse-ring:nth-child(3) {
+  animation-delay: 1.2s;
+}
+
+@keyframes takeover-pulsate {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.rings-center-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+  color: var(--bg-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  box-shadow: 0 0 20px rgba(212, 160, 23, 0.6);
+  z-index: 2;
+}
+
+.takeover-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.75rem, 6vw, 2.3rem);
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 0.65rem;
+}
+
+.takeover-barber-highlight {
+  font-size: clamp(1.1rem, 4vw, 1.35rem);
+  color: var(--accent-gold);
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+/* Reserve space at bottom on mobile so content is never covered */
+@media (max-width: 991.98px) {
+  .page-main-content {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
+  }
+}
+
+/* ==========================================================================
+   Mobile-First Screen Optimization Rules (@media max-width: 767.98px)
+   ========================================================================== */
+@media (max-width: 767.98px) {
+  /* Prevent horizontal micro-wobble */
+  html, body {
+    overflow-x: hidden !important;
+    position: relative;
+  }
+
+  /* Compact top floating island on phone */
+  .floating-nav-wrapper {
+    top: 8px !important;
+    padding: 0 0.5rem !important;
+  }
+
+  .floating-nav-island {
+    padding: 0.35rem 0.75rem !important;
+    border-radius: 36px !important;
+  }
+
+  /* Fluid typography for editorial headings */
+  h1, .salon-heading {
+    font-size: clamp(1.55rem, 6vw, 2.2rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  h2 {
+    font-size: clamp(1.35rem, 5vw, 1.75rem) !important;
+  }
+
+  h3 {
+    font-size: clamp(1.15rem, 4vw, 1.45rem) !important;
+  }
+
+  .display-2 {
+    font-size: 3.5rem !important;
+  }
+
+  /* Container edge padding */
+  .container, .container-fluid {
+    padding-left: 0.85rem !important;
+    padding-right: 0.85rem !important;
+  }
+
+  /* Responsive Cards */
+  .salon-card {
+    padding: 1.15rem 1rem !important;
+    border-radius: 14px !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Form controls touch target and iOS auto-zoom prevention */
+  .form-control, .form-select {
+    font-size: 16px !important; /* Critical: prevents iOS auto-zoom */
+    min-height: 48px !important;
+    padding: 0.65rem 0.85rem !important;
+  }
+
+  /* Buttons on mobile */
+  .btn {
+    min-height: 44px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn-lg {
+    min-height: 50px !important;
+    font-size: 1.05rem !important;
+    padding: 0.75rem 1.25rem !important;
+  }
+
+  /* Modals: full coverage with comfortable margins */
+  .glass-modal-backdrop {
+    padding: 0.65rem !important;
+  }
+
+  .glass-modal {
+    max-width: 96% !important;
+    width: 100% !important;
+    padding: 1.25rem 1rem !important;
+    max-height: 86vh !important;
+    overflow-y: auto !important;
+    border-radius: 14px !important;
+  }
+
+  /* Selectable Cards (Join Queue & Services) */
+  .selectable-card {
+    padding: 0.85rem 1rem !important;
+    min-height: 56px !important;
+  }
+
+  /* Barber chip on mobile */
+  .barber-chip {
+    padding: 0.35rem 0.75rem 0.35rem 0.4rem !important;
+  }
+
+  /* Reception Queue Table: smooth horizontal swipe with visual indicator */
+  .reception-table-wrap {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .reception-table th,
+  .reception-table td {
+    padding: 0.65rem 0.55rem !important;
+    font-size: 0.85rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* Fullscreen Call Alert on Mobile */
+  .turn-call-overlay {
+    padding: 1rem !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

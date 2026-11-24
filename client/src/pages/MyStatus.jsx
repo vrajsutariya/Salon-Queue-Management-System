@@ -381,7 +381,7 @@ export const MyStatus = () => {
           )}
 
           {/* 2. Hero Token Card */}
-          <div className="salon-card p-4 p-md-5 mb-4 text-center">
+          <div className="salon-card p-3 p-sm-4 p-md-5 mb-4 text-center">
             {/* Top Token Badge */}
             <div className="mb-3">
               <div className="hero-token-badge">

@@ -158,7 +158,7 @@ export const WaitingAreaTV = () => {
               className="salon-heading mb-0"
               style={{
                 fontFamily: "'Fraunces', serif",
-                fontSize: '2rem',
+                fontSize: 'clamp(1.3rem, 4vw, 2rem)',
                 color: 'var(--heading-color)',
                 letterSpacing: '-0.02em',
               }}

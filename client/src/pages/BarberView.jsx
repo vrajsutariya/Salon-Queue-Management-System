@@ -228,7 +228,7 @@ export const BarberView = () => {
   const isBusy = activeBarber?.status === 'busy' || !!activeCustomer;
 
   return (
-    <div className="container py-3 py-md-4" style={{ maxWidth: '960px' }}>
+    <div className="container py-3 py-md-4 px-2 px-sm-3" style={{ maxWidth: '960px' }}>
       {/* Toast Notice Banner */}
       <AnimatePresence>
         {actionNotice && (
@@ -267,6 +267,7 @@ export const BarberView = () => {
           backgroundColor: 'var(--bg-card)',
           border: '1px solid var(--border-color)',
           scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch',
         }}
       >
         <span className="small text-secondary px-2 d-none d-sm-inline fw-semibold text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.08em' }}>
@@ -382,7 +383,7 @@ export const BarberView = () => {
 
       {/* 2. Active Customer in Chair Card / Empty State */}
       <motion.div
-        className="salon-card p-4 p-md-4 mb-3"
+        className="salon-card p-3 p-sm-4 mb-3"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}

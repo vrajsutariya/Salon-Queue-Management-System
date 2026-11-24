@@ -10,6 +10,26 @@ import {
 const router = express.Router();
 
 /**
+ * Helper to generate next unique token for today (collision-free)
+ */
+async function generateUniqueToken() {
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const todayCount = await QueueTicket.countDocuments({
+    createdAt: { $gte: startOfToday },
+  });
+
+  let seq = Math.max(1, todayCount + 1);
+  let candidate = `S-${seq}`;
+  while (await QueueTicket.exists({ token: candidate })) {
+    seq++;
+    candidate = `S-${seq}`;
+  }
+  return candidate;
+}
+
+/**
  * GET /api/queue
  * List all active queue tickets (or filtered by status)
  */
@@ -246,15 +266,8 @@ router.post('/walkin', async (req, res) => {
       });
     }
 
-    // 4. Token sequence for today
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
-
-    const todayCount = await QueueTicket.countDocuments({
-      createdAt: { $gte: startOfToday },
-    });
-
-    const token = `S-${todayCount + 1}`;
+    // 4. Token sequence for today (collision-free)
+    const token = await generateUniqueToken();
 
     // 5. Calculate wait estimate with ceil formula
     const activeBarbers = await Barber.find({ isOnDuty: true });
@@ -388,15 +401,8 @@ router.post('/join', async (req, res) => {
       });
     }
 
-    // 4. Generate daily token sequence: S-1, S-2...
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
-
-    const todayCount = await QueueTicket.countDocuments({
-      createdAt: { $gte: startOfToday },
-    });
-
-    const token = `S-${todayCount + 1}`;
+    // 4. Generate daily token sequence: S-1, S-2... (collision-free)
+    const token = await generateUniqueToken();
 
     // 5. Calculate wait time ahead using ceil formula
     const activeBarbers = await Barber.find({ isOnDuty: true });

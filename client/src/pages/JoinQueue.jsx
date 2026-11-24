@@ -147,21 +147,21 @@ export const JoinQueue = () => {
   const closingTimeDisplay = liveStatus?.closingTime || '9:00 PM';
 
   return (
-    <div className="container py-4 py-md-5" style={{ maxWidth: '1060px' }}>
+    <div className="container py-3 py-md-5" style={{ maxWidth: '1060px' }}>
       {/* Top Breadcrumb & Heading with Breathing Room */}
       <motion.div
-        className="mb-4 mb-md-5"
+        className="mb-3 mb-md-5"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <Link to="/" className="btn btn-sm btn-outline-gold mb-3 px-3 py-1 rounded-pill">
+        <Link to="/" className="btn btn-sm btn-outline-gold mb-2 mb-md-3 px-3 py-1 rounded-pill">
           <i className="bi bi-arrow-left me-1"></i> {t('backHome')}
         </Link>
-        <h1 className="salon-heading mb-1" style={{ fontSize: '2.4rem' }}>
+        <h1 className="salon-heading mb-1" style={{ fontSize: 'clamp(1.75rem, 5.5vw, 2.4rem)' }}>
           {t('joinTitle')}
         </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', maxWidth: '640px' }} className="mb-0">
+        <p style={{ color: 'var(--text-secondary)', fontSize: 'clamp(0.88rem, 2.5vw, 1rem)', maxWidth: '640px' }} className="mb-0">
           {t('joinSubtitle')}
         </p>
       </motion.div>
@@ -211,7 +211,7 @@ export const JoinQueue = () => {
           <div className="col-lg-8">
             {/* 1. Customer Details */}
             <motion.div
-              className="salon-card p-4 p-md-5 mb-4"
+              className="salon-card p-3 p-sm-4 p-md-5 mb-4"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45 }}
@@ -230,6 +230,7 @@ export const JoinQueue = () => {
                 <input
                   id="customerName"
                   type="text"
+                  autoComplete="name"
                   className={`form-control ${
                     touched.name && !isNameValid ? 'is-invalid' : touched.name && isNameValid ? 'is-valid' : ''
                   }`}
@@ -253,6 +254,9 @@ export const JoinQueue = () => {
                   <input
                     id="phone"
                     type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    autoComplete="tel"
                     maxLength={10}
                     className={`form-control ${
                       touched.phone && !isPhoneValid ? 'is-invalid' : touched.phone && isPhoneValid ? 'is-valid' : ''
@@ -281,7 +285,7 @@ export const JoinQueue = () => {
 
             {/* 2. Service Selection Cards */}
             <motion.div
-              className="salon-card p-4 p-md-5 mb-4"
+              className="salon-card p-3 p-sm-4 p-md-5 mb-4"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.1 }}
@@ -371,7 +375,7 @@ export const JoinQueue = () => {
 
             {/* 3. Barber Preference */}
             <motion.div
-              className="salon-card p-4 p-md-5 mb-4"
+              className="salon-card p-3 p-sm-4 p-md-5 mb-4"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.2 }}
@@ -572,6 +576,48 @@ export const JoinQueue = () => {
             </motion.div>
           </div>
         </div>
+
+        {/* Sticky Mobile Join Action Bar (Mobile Viewports Only) */}
+        {selectedServices.length > 0 && (
+          <div
+            className="d-lg-none fixed-bottom p-3 shadow-lg"
+            style={{
+              bottom: 'calc(62px + env(safe-area-inset-bottom, 0px))',
+              background: 'rgba(14, 14, 18, 0.96)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              borderTop: '1px solid rgba(229, 195, 120, 0.3)',
+              zIndex: 1025,
+            }}
+          >
+            <div className="d-flex align-items-center justify-content-between gap-3">
+              <div>
+                <div className="text-secondary small" style={{ fontSize: '0.75rem' }}>
+                  {summary.count} {t('services')} • ~{summary.totalMinutes}m
+                </div>
+                <div className="fw-bold fs-5" style={{ color: 'var(--accent-color)' }}>
+                  ₹{summary.totalPrice}
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={!isFormValid || submitting}
+                className="btn btn-gold px-4 py-2 fw-bold d-flex align-items-center gap-2 shadow"
+                style={{ minHeight: '44px', borderRadius: '10px' }}
+              >
+                {submitting ? (
+                  <span className="spinner-border spinner-border-sm"></span>
+                ) : (
+                  <>
+                    <span>{t('joinQueue')}</span>
+                    <i className="bi bi-arrow-right"></i>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
       </form>
       )}
     </div>

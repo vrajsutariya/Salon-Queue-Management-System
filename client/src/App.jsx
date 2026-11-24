@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
 import { Navbar } from './components/Navbar';
+import { MobileNavDock } from './components/MobileNavDock';
 import { Footer } from './components/Footer';
 
 // Pages
@@ -19,7 +20,7 @@ function App() {
       <BrowserRouter>
         <div className="d-flex flex-column min-vh-100 position-relative" style={{ backgroundColor: 'var(--bg-deep)' }}>
           <Navbar />
-          <main className="flex-grow-1 pt-2 pt-md-3">
+          <main className="flex-grow-1 pt-2 pt-md-3 page-main-content">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/join" element={<JoinQueue />} />
@@ -33,6 +34,7 @@ function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
+          <MobileNavDock />
           <Footer />
         </div>
       </BrowserRouter>

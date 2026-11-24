@@ -249,7 +249,7 @@ export const Reception = () => {
   };
 
   return (
-    <div className="container-fluid py-4 py-md-5 px-3 px-md-5 animate-fade-in-up" style={{ maxWidth: '1440px' }}>
+    <div className="container-fluid py-3 py-md-4 px-2 px-sm-3 px-md-5 animate-fade-in-up" style={{ maxWidth: '1440px' }}>
       {/* Action Notification Toast Banner */}
       <AnimatePresence>
         {actionNotice && (
@@ -280,47 +280,47 @@ export const Reception = () => {
 
       {/* Spacious Header with Digital Clock & Summary */}
       <div
-        className="d-flex flex-wrap justify-content-between align-items-center mb-4 mb-md-5 p-4 rounded-4"
+        className="d-flex flex-wrap justify-content-between align-items-center mb-3 mb-md-4 p-3 p-md-4 rounded-4 gap-3"
         style={{
           backgroundColor: 'var(--bg-card)',
           border: '1px solid var(--border-color)',
           boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
         }}
       >
-        <div className="mb-2 mb-lg-0">
+        <div className="mb-1 mb-lg-0">
           <div className="d-flex align-items-center gap-2 mb-1">
             <i className="bi bi-shield-check fs-4" style={{ color: 'var(--accent-color)' }}></i>
-            <h2 className="mb-0 salon-heading" style={{ color: 'var(--heading-color)', fontSize: '2rem' }}>
+            <h2 className="mb-0 salon-heading" style={{ color: 'var(--heading-color)', fontSize: 'clamp(1.4rem, 4vw, 2rem)' }}>
               {t('receptionDashboard')}
             </h2>
           </div>
-          <p className="text-secondary mb-0 small" style={{ fontSize: '0.9rem' }}>
+          <p className="text-secondary mb-0 small" style={{ fontSize: '0.85rem' }}>
             {t('receptionSubtitle')}
           </p>
         </div>
 
         {/* Live Clock & Summary Controls */}
-        <div className="d-flex flex-wrap align-items-center gap-3">
+        <div className="d-flex flex-wrap align-items-center gap-2 gap-sm-3">
           {/* Digital Clock */}
           <div
-            className="px-3 py-2 rounded-pill d-flex align-items-center gap-2"
+            className="px-2 px-sm-3 py-1 py-sm-2 rounded-pill d-flex align-items-center gap-2"
             style={{ backgroundColor: 'var(--bg-deep)', border: '1px solid var(--border-color)' }}
           >
             <i className="bi bi-clock text-warning"></i>
-            <span className="fw-bold" style={{ color: 'var(--accent-color)', fontFamily: 'monospace', fontSize: '1.05rem', letterSpacing: '0.5px' }}>
+            <span className="fw-bold" style={{ color: 'var(--accent-color)', fontFamily: 'monospace', fontSize: '0.95rem', letterSpacing: '0.5px' }}>
               {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
             </span>
           </div>
 
           {/* Quick Metrics */}
-          <div className="d-flex align-items-center gap-2">
-            <span className="badge badge-status-waiting px-3 py-2 rounded-pill fw-semibold" title={t('waitingNow')}>
+          <div className="d-flex flex-wrap align-items-center gap-1 gap-sm-2">
+            <span className="badge badge-status-waiting px-2 px-sm-3 py-2 rounded-pill fw-semibold" title={t('waitingNow')}>
               <i className="bi bi-people me-1"></i> {counts.waiting} {t('status_WAITING')}
             </span>
-            <span className="badge badge-status-called px-3 py-2 rounded-pill fw-semibold" title={t('status_CALLED')}>
+            <span className="badge badge-status-called px-2 px-sm-3 py-2 rounded-pill fw-semibold" title={t('status_CALLED')}>
               <i className="bi bi-bell me-1"></i> {counts.called} {t('status_CALLED')}
             </span>
-            <span className="badge badge-status-in-chair px-3 py-2 rounded-pill fw-semibold" title={t('status_IN_CHAIR')}>
+            <span className="badge badge-status-in-chair px-2 px-sm-3 py-2 rounded-pill fw-semibold" title={t('status_IN_CHAIR')}>
               <i className="bi bi-scissors me-1"></i> {counts.inChair} {t('status_IN_CHAIR')}
             </span>
           </div>
@@ -329,7 +329,8 @@ export const Reception = () => {
           <button
             type="button"
             onClick={() => setShowWalkinModal(true)}
-            className="btn btn-gold d-flex align-items-center gap-2 shadow-sm px-4"
+            className="btn btn-gold d-flex align-items-center gap-2 shadow-sm px-3 px-sm-4 py-2"
+            style={{ minHeight: '44px' }}
           >
             <i className="bi bi-person-plus-fill"></i>
             <span>{t('addWalkin')}</span>
@@ -529,122 +530,213 @@ export const Reception = () => {
                 </button>
               </div>
             ) : (
-              <div className="table-responsive reception-table-wrap">
-                <table className="reception-table w-100 align-middle mb-0">
-                  <thead>
-                    <tr>
-                      <th style={{ width: '90px' }}>Token</th>
-                      <th>{t('customer')}</th>
-                      <th>{t('services')}</th>
-                      <th>{t('preferredBarber')}</th>
-                      <th>{t('waitingTime')}</th>
-                      <th>{t('status')}</th>
-                      <th className="text-end">{t('actions')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredTickets.map((ticket) => {
-                      const elapsedMins = getElapsedMinutes(ticket.joinedAt);
-                      const isDelayed = elapsedMins >= 60 && ticket.status === 'waiting';
+              <>
+                {/* Desktop/Tablet Table View */}
+                <div className="table-responsive reception-table-wrap d-none d-md-block">
+                  <table className="reception-table w-100 align-middle mb-0">
+                    <thead>
+                      <tr>
+                        <th style={{ width: '90px' }}>Token</th>
+                        <th>{t('customer')}</th>
+                        <th>{t('services')}</th>
+                        <th>{t('preferredBarber')}</th>
+                        <th>{t('waitingTime')}</th>
+                        <th>{t('status')}</th>
+                        <th className="text-end">{t('actions')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredTickets.map((ticket) => {
+                        const elapsedMins = getElapsedMinutes(ticket.joinedAt);
+                        const isDelayed = elapsedMins >= 60 && ticket.status === 'waiting';
 
-                      return (
-                        <tr
-                          key={ticket._id}
-                          className={isDelayed ? 'queue-row-delayed' : ''}
-                        >
-                          {/* Token Badge */}
-                          <td>
+                        return (
+                          <tr
+                            key={ticket._id}
+                            className={isDelayed ? 'queue-row-delayed' : ''}
+                          >
+                            {/* Token Badge */}
+                            <td>
+                              <span
+                                className="px-2 py-1 rounded fw-bold d-inline-block text-center"
+                                style={{
+                                  background: 'rgba(229, 195, 120, 0.12)',
+                                  border: '1px solid var(--accent-color)',
+                                  color: 'var(--accent-color)',
+                                  minWidth: '55px',
+                                  fontSize: '0.95rem',
+                                }}
+                              >
+                                {ticket.token}
+                              </span>
+                            </td>
+
+                            {/* Customer Name & Phone */}
+                            <td>
+                              <div className="fw-semibold" style={{ color: 'var(--heading-color)', fontSize: '0.95rem' }}>
+                                {ticket.customerName}
+                              </div>
+                              <small className="text-secondary" style={{ fontSize: '0.78rem' }}>
+                                +91 {ticket.phone}
+                              </small>
+                            </td>
+
+                            {/* Services Selected */}
+                            <td>
+                              <div className="d-flex flex-wrap gap-1">
+                                {ticket.services?.map((s) => (
+                                  <span
+                                    key={s._id || s}
+                                    className="badge px-2 py-1"
+                                    style={{
+                                      backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                                      border: '1px solid var(--border-color)',
+                                      color: 'var(--text-secondary)',
+                                      fontSize: '0.75rem',
+                                      fontWeight: 500,
+                                    }}
+                                  >
+                                    {s.name?.[lang] || s.name?.en || s.name} ({s.durationMinutes}m)
+                                  </span>
+                                ))}
+                              </div>
+                            </td>
+
+                            {/* Preferred Barber */}
+                            <td>
+                              {!ticket.preferredBarber || ticket.preferredBarber === 'any' ? (
+                                <span
+                                  className="badge px-2 py-1"
+                                  style={{
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                    color: 'var(--text-secondary)',
+                                    fontSize: '0.75rem',
+                                  }}
+                                >
+                                  {t('fastestAvailable')}
+                                </span>
+                              ) : (
+                                <span
+                                  className="badge badge-accent px-2 py-1 fw-semibold"
+                                  style={{ fontSize: '0.75rem' }}
+                                >
+                                  <i className="bi bi-person-check-fill me-1"></i>
+                                  {barbers.find((b) => b._id === ticket.preferredBarber)?.name || ticket.preferredBarber}
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Waiting Time */}
+                            <td>
+                              <span
+                                className="fw-semibold"
+                                style={{
+                                  fontFamily: 'monospace',
+                                  color: isDelayed ? 'var(--amber-warning)' : 'var(--text-secondary)',
+                                  fontSize: '0.88rem',
+                                }}
+                              >
+                                {formatElapsedTime(ticket.joinedAt)}
+                              </span>
+                              {isDelayed && (
+                                <span className="badge queue-badge-delayed d-block mt-1" style={{ fontSize: '0.68rem', width: 'fit-content' }}>
+                                  <i className="bi bi-exclamation-triangle-fill me-1"></i> {t('waitTimeExceeded')}
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Status */}
+                            <td>
+                              {ticket.status === 'waiting' && (
+                                <span className="badge badge-status-waiting px-2 py-1 rounded-pill small">
+                                  {t('status_WAITING')}
+                                </span>
+                              )}
+                              {ticket.status === 'called' && (
+                                <span className="badge badge-status-called px-2 py-1 rounded-pill small">
+                                  <i className="bi bi-bell-fill me-1"></i> {t('status_CALLED')}
+                                </span>
+                              )}
+                              {ticket.status === 'in-chair' && (
+                                <span className="badge badge-status-in-chair px-2 py-1 rounded-pill small">
+                                  <i className="bi bi-scissors me-1"></i> {t('status_IN_CHAIR')}
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Row Actions */}
+                            <td className="text-end">
+                              <div className="btn-group btn-group-sm">
+                                {ticket.status === 'called' && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setActionConfirm({ type: 'no-show', ticket })}
+                                    className="btn btn-outline-warning py-1 px-2"
+                                    title={t('noShowBtn')}
+                                    style={{ fontSize: '0.75rem' }}
+                                  >
+                                    <i className="bi bi-person-x me-1"></i>
+                                    {t('noShowBtn')}
+                                  </button>
+                                )}
+
+                                <button
+                                  type="button"
+                                  onClick={() => setActionConfirm({ type: 'cancel', ticket })}
+                                  className="btn btn-ghost-danger py-1 px-2"
+                                  title={t('cancel')}
+                                  style={{ fontSize: '0.75rem' }}
+                                >
+                                  <i className="bi bi-trash3"></i>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile Handheld Card View (d-md-none) */}
+                <div className="d-md-none d-flex flex-column gap-3">
+                  {filteredTickets.map((ticket) => {
+                    const elapsedMins = getElapsedMinutes(ticket.joinedAt);
+                    const isDelayed = elapsedMins >= 60 && ticket.status === 'waiting';
+
+                    return (
+                      <div
+                        key={ticket._id}
+                        className={`p-3 rounded-3 ${isDelayed ? 'queue-row-delayed' : ''}`}
+                        style={{
+                          backgroundColor: 'var(--bg-surface)',
+                          border: isDelayed ? '1px solid var(--amber-warning)' : '1px solid var(--border-color)',
+                        }}
+                      >
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <div className="d-flex align-items-center gap-2">
                             <span
-                              className="px-2 py-1 rounded fw-bold d-inline-block text-center"
+                              className="px-2 py-1 rounded fw-bold text-center"
                               style={{
                                 background: 'rgba(229, 195, 120, 0.12)',
                                 border: '1px solid var(--accent-color)',
                                 color: 'var(--accent-color)',
-                                minWidth: '55px',
                                 fontSize: '0.95rem',
                               }}
                             >
                               {ticket.token}
                             </span>
-                          </td>
-
-                          {/* Customer Name & Phone */}
-                          <td>
-                            <div className="fw-semibold" style={{ color: 'var(--heading-color)', fontSize: '0.95rem' }}>
-                              {ticket.customerName}
+                            <div>
+                              <div className="fw-semibold text-white" style={{ fontSize: '0.95rem' }}>
+                                {ticket.customerName}
+                              </div>
+                              <small className="text-secondary" style={{ fontSize: '0.78rem' }}>
+                                +91 {ticket.phone}
+                              </small>
                             </div>
-                            <small className="text-secondary" style={{ fontSize: '0.78rem' }}>
-                              +91 {ticket.phone}
-                            </small>
-                          </td>
-
-                          {/* Services Selected */}
-                          <td>
-                            <div className="d-flex flex-wrap gap-1">
-                              {ticket.services?.map((s) => (
-                                <span
-                                  key={s._id || s}
-                                  className="badge px-2 py-1"
-                                  style={{
-                                    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                                    border: '1px solid var(--border-color)',
-                                    color: 'var(--text-secondary)',
-                                    fontSize: '0.75rem',
-                                    fontWeight: 500,
-                                  }}
-                                >
-                                  {s.name?.[lang] || s.name?.en || s.name} ({s.durationMinutes}m)
-                                </span>
-                              ))}
-                            </div>
-                          </td>
-
-                          {/* Preferred Barber (Highlighted clearly) */}
-                          <td>
-                            {!ticket.preferredBarber || ticket.preferredBarber === 'any' ? (
-                              <span
-                                className="badge px-2 py-1"
-                                style={{
-                                  background: 'rgba(255, 255, 255, 0.05)',
-                                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                                  color: 'var(--text-secondary)',
-                                  fontSize: '0.75rem',
-                                }}
-                              >
-                                {t('fastestAvailable')}
-                              </span>
-                            ) : (
-                              <span
-                                className="badge badge-accent px-2 py-1 fw-semibold"
-                                style={{ fontSize: '0.75rem' }}
-                              >
-                                <i className="bi bi-person-check-fill me-1"></i>
-                                {barbers.find((b) => b._id === ticket.preferredBarber)?.name || ticket.preferredBarber}
-                              </span>
-                            )}
-                          </td>
-
-                          {/* Waiting Time (Running Timer & Highlighting Rule for > 60m) */}
-                          <td>
-                            <span
-                              className="fw-semibold"
-                              style={{
-                                fontFamily: 'monospace',
-                                color: isDelayed ? 'var(--amber-warning)' : 'var(--text-secondary)',
-                                fontSize: '0.88rem',
-                              }}
-                            >
-                              {formatElapsedTime(ticket.joinedAt)}
-                            </span>
-                            {isDelayed && (
-                              <span className="badge queue-badge-delayed d-block mt-1" style={{ fontSize: '0.68rem', width: 'fit-content' }}>
-                                <i className="bi bi-exclamation-triangle-fill me-1"></i> {t('waitTimeExceeded')}
-                              </span>
-                            )}
-                          </td>
-
-                          {/* Status */}
-                          <td>
+                          </div>
+                          <div>
                             {ticket.status === 'waiting' && (
                               <span className="badge badge-status-waiting px-2 py-1 rounded-pill small">
                                 {t('status_WAITING')}
@@ -660,41 +752,97 @@ export const Reception = () => {
                                 <i className="bi bi-scissors me-1"></i> {t('status_IN_CHAIR')}
                               </span>
                             )}
-                          </td>
+                          </div>
+                        </div>
 
-                          {/* Row Actions: [ No-show ] and [ Cancel ] */}
-                          <td className="text-end">
-                            <div className="btn-group btn-group-sm">
-                              {ticket.status === 'called' && (
-                                <button
-                                  type="button"
-                                  onClick={() => setActionConfirm({ type: 'no-show', ticket })}
-                                  className="btn btn-outline-warning py-1 px-2"
-                                  title={t('noShowBtn')}
-                                  style={{ fontSize: '0.75rem' }}
-                                >
-                                  <i className="bi bi-person-x me-1"></i>
-                                  {t('noShowBtn')}
-                                </button>
-                              )}
+                        {/* Services & Barber */}
+                        <div className="d-flex flex-wrap gap-1 mb-2">
+                          {ticket.services?.map((s) => (
+                            <span
+                              key={s._id || s}
+                              className="badge px-2 py-1"
+                              style={{
+                                backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                                border: '1px solid var(--border-color)',
+                                color: 'var(--text-secondary)',
+                                fontSize: '0.72rem',
+                              }}
+                            >
+                              {s.name?.[lang] || s.name?.en || s.name} ({s.durationMinutes}m)
+                            </span>
+                          ))}
+                          {!ticket.preferredBarber || ticket.preferredBarber === 'any' ? (
+                            <span
+                              className="badge px-2 py-1"
+                              style={{
+                                background: 'rgba(255, 255, 255, 0.05)',
+                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                color: 'var(--text-secondary)',
+                                fontSize: '0.72rem',
+                              }}
+                            >
+                              {t('fastestAvailable')}
+                            </span>
+                          ) : (
+                            <span
+                              className="badge badge-accent px-2 py-1 fw-semibold"
+                              style={{ fontSize: '0.72rem' }}
+                            >
+                              <i className="bi bi-person-check-fill me-1"></i>
+                              {barbers.find((b) => b._id === ticket.preferredBarber)?.name || ticket.preferredBarber}
+                            </span>
+                          )}
+                        </div>
 
+                        {/* Footer: Elapsed time & Action buttons */}
+                        <div className="d-flex justify-content-between align-items-center pt-2 border-top border-secondary border-opacity-25">
+                          <div className="d-flex align-items-center gap-1">
+                            <span
+                              className="fw-semibold"
+                              style={{
+                                fontFamily: 'monospace',
+                                color: isDelayed ? 'var(--amber-warning)' : 'var(--text-secondary)',
+                                fontSize: '0.85rem',
+                              }}
+                            >
+                              <i className="bi bi-clock me-1"></i>
+                              {formatElapsedTime(ticket.joinedAt)}
+                            </span>
+                            {isDelayed && (
+                              <span className="badge queue-badge-delayed" style={{ fontSize: '0.65rem' }}>
+                                {t('waitTimeExceeded')}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="d-flex align-items-center gap-2">
+                            {ticket.status === 'called' && (
                               <button
                                 type="button"
-                                onClick={() => setActionConfirm({ type: 'cancel', ticket })}
-                                className="btn btn-ghost-danger py-1 px-2"
-                                title={t('cancel')}
-                                style={{ fontSize: '0.75rem' }}
+                                onClick={() => setActionConfirm({ type: 'no-show', ticket })}
+                                className="btn btn-outline-warning btn-sm py-1 px-2"
+                                style={{ minHeight: '36px', fontSize: '0.8rem' }}
                               >
-                                <i className="bi bi-trash3"></i>
+                                <i className="bi bi-person-x me-1"></i>
+                                {t('noShowBtn')}
                               </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => setActionConfirm({ type: 'cancel', ticket })}
+                              className="btn btn-ghost-danger btn-sm py-1 px-2"
+                              title={t('cancel')}
+                              style={{ minHeight: '36px', fontSize: '0.8rem' }}
+                            >
+                              <i className="bi bi-trash3 me-1"></i> {t('cancel')}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
             )}
           </div>
         </div>

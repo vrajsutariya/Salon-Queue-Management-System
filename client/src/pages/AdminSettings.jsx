@@ -501,7 +501,7 @@ export const AdminSettings = () => {
   // RENDER: 2. OWNER MANAGEMENT DASHBOARD
   // ==========================================
   return (
-    <div className="container py-4 py-md-5" style={{ maxWidth: '1140px' }}>
+    <div className="container py-3 py-md-4 px-2 px-sm-3" style={{ maxWidth: '1140px' }}>
       {/* Action Notification Toast Banner */}
       <AnimatePresence>
         {actionNotice && (
@@ -540,7 +540,7 @@ export const AdminSettings = () => {
           </div>
           <h1
             className="salon-heading mb-0 text-white"
-            style={{ fontFamily: "'Fraunces', serif", fontSize: '2rem' }}
+            style={{ fontFamily: "'Fraunces', serif", fontSize: 'clamp(1.4rem, 4.5vw, 2rem)' }}
           >
             {t('ownerSettings')}
           </h1>

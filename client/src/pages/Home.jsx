@@ -52,10 +52,10 @@ export const Home = () => {
   const isOnlineOpen = liveStatus?.isQueueOpen !== false;
 
   return (
-    <div className="container py-4" style={{ maxWidth: '1060px' }}>
+    <div className="container py-3 py-md-4" style={{ maxWidth: '1060px' }}>
       {/* 1. Atelier Hero Banner */}
       <motion.div
-        className="d-flex flex-wrap align-items-center justify-content-between mb-4 gap-3 pt-2"
+        className="d-flex flex-wrap align-items-center justify-content-between mb-3 mb-md-4 gap-3 pt-1 pt-md-2"
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -78,7 +78,7 @@ export const Home = () => {
           <h1
             className="mb-1 salon-heading"
             style={{
-              fontSize: '2.5rem',
+              fontSize: 'clamp(1.75rem, 5.5vw, 2.5rem)',
               color: 'var(--heading-color)',
               lineHeight: 1.15,
             }}
@@ -89,9 +89,9 @@ export const Home = () => {
             className="mb-0"
             style={{
               color: 'var(--text-secondary)',
-              fontSize: '1rem',
+              fontSize: 'clamp(0.88rem, 2.5vw, 1rem)',
               maxWidth: '680px',
-              lineHeight: 1.55,
+              lineHeight: 1.5,
             }}
           >
             {t('welcomeHomeSubtitle')}
@@ -143,7 +143,7 @@ export const Home = () => {
 
       {/* 2. Interactive Live Queue Hero Showcase */}
       <motion.div
-        className="salon-card p-4 p-md-5 mb-4 text-center position-relative"
+        className="salon-card p-3 p-sm-4 p-md-5 mb-4 text-center position-relative"
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.1 }}
@@ -191,6 +191,7 @@ export const Home = () => {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               lineHeight: 1,
+              fontSize: 'clamp(3.5rem, 12vw, 5rem)',
             }}
           >
             {loading ? '...' : waitingCount}
@@ -199,7 +200,7 @@ export const Home = () => {
           {/* Friendly Empty State Badge when waitingCount === 0 */}
           <div className="lead fw-medium mb-3" style={{ color: 'var(--heading-color)', fontSize: '1.25rem' }}>
             {waitingCount === 0 ? (
-              <span className="badge badge-accent px-3 py-2 rounded-pill fs-6 fw-semibold shadow-sm d-inline-flex align-items-center gap-2">
+              <span className="badge badge-accent px-3 py-2 rounded-pill fs-6 fw-semibold shadow-sm d-inline-flex align-items-center gap-2 text-wrap" style={{ maxWidth: '100%', lineHeight: 1.4 }}>
                 <i className="bi bi-door-open-fill text-warning"></i>
                 <span>{t('emptyWaitingHome')}</span>
               </span>
