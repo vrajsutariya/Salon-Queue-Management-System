@@ -1,6 +1,6 @@
 # Salon Queue Management System
 
-**Live demo:** https://salon-queue-management-system-nu.vercel.app
+**Live demo:** https://salon-queue-management-system-nu.vercel.app/  
 **Hosted on:** Vercel (frontend) + Render (backend)  
 **Staff / Admin PIN:** `1234`  
 **Staff & Station Portals:**
@@ -392,6 +392,8 @@ Salon-Queue-Management-System/
 │   ├── package.json                       # Backend dependencies & scripts
 │   └── server.js                          # HTTP listener, Socket.io & MongoDB startup
 ├── AGENTS.md                              # Developer & Agent guidelines
+├── prompts.md                             # Chronological log of all prompts, failed attempts & fixes
+├── reflection.md                          # Half-page reflection document (MSc IT Vibe Coding Lab)
 ├── package.json                           # Root monorepo workspace scripts
 └── README.md                              # Master project documentation
 ```
@@ -651,6 +653,8 @@ To maintain strict alignment with the MSc IT Vibe Coding Lab specification, this
 - **Assignment:** Salon Queue Management System
 - **Developer:** Vraj Sutariya ([@vrajsutariya](https://github.com/vrajsutariya))
 - **Methodology:** Specification-driven Vibe Coding with Google Antigravity & OpenAI Codex adhering to `AGENTS.md` and `docs/`.
+- **Chronological Prompts Log:** [`prompts.md`](prompts.md) — complete transcript of all 9 prompt steps, failed attempts, debugging iterations, and fixes.
+- **Reflection Document:** [`reflection.md`](reflection.md) — half-page formal reflection covering system architecture, AI collaboration, concurrency challenges, and key takeaways.
 
 ---
 
